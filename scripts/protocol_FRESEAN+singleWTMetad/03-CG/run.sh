@@ -6,7 +6,7 @@
 #SBATCH -t 0-08:00                  # wall time (D-HH:MM)
 #SBATCH -J COARSE
 
-module load fftw-3.3.10-gcc-11.2.0
+# FFTW is required
 
 #BEGIN INPUT
 gmx=gmx_plumed
@@ -26,9 +26,6 @@ outTRRprotCG=sample-NPT_prot_pbc-CG.trr
 
 #GMX group number for protein (gmx trjconv)
 outGrp=1
-
-#GMX itp file with nonbonded parameters
-GMXDATA=$HOME/gromacs-2022.5-plumed-2.8.2
 
 #time between frames in input trajectory
 TRJtimestep=0.020

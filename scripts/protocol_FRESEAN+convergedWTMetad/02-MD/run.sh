@@ -3,7 +3,7 @@
 #SBATCH -p general
 #SBATCH -G a100:1
 #SBATCH -N 1
-#SBATCH -c 16
+#SBATCH -c 12
 #SBATCH -t 0-12:00                  # wall time (D-HH:MM)
 #SBATCH -J SAMPLE
 

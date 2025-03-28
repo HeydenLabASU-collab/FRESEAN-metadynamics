@@ -2,9 +2,9 @@
 #SBATCH -p general
 #SBATCH -G a100:1
 #SBATCH -N 1
-#SBATCH -c 16
+#SBATCH -c 12
 #SBATCH -t 2-00:00
-#SBATCH -J VANILLA
+#SBATCH -J RESAMPLE
 
 # Working directory for where the topology and starting structure are
 workingDir=..

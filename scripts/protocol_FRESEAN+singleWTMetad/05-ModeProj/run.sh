@@ -6,8 +6,9 @@
 #SBATCH -t 0-01:00                  # wall time (D-HH:MM)
 #SBATCH -J PROJ
 
-module load mamba/latest
-module load fftw-3.3.10-gcc-11.2.0
+# FFTW is required
+# Python3 with numpy is required
+
 #BEGIN INPUT
 #all-atom reference structure (must match CG reference)
 inpRefPDBaa=../03-CG/ref.pdb

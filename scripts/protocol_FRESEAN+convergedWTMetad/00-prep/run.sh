@@ -3,7 +3,7 @@
 #BEGIN INPUT
 gmx=gmx_plumed
 pdb=1hel.pdb
-ff=6 #Option 6 corresponds to AMBER99sb-ILSB
+ff=6 #Option 6 corresponds to AMBER99sb-ILDN
 wat=1 #Option 1 corresponds to tip3p
 box=9.3 #Default box size
 salt=0.15 #Default salt concentration

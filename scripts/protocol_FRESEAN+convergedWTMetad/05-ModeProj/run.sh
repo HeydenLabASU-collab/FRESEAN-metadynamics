@@ -6,15 +6,16 @@
 #SBATCH -t 0-01:00                  # wall time (D-HH:MM)
 #SBATCH -J PROJ
 
-module load mamba/latest
-module load fftw-3.3.10-gcc-11.2.0
+# FFTW is required
+# Python3 with numpy is required
+
 #BEGIN INPUT
 #all-atom reference structure (must match CG reference)
 inpRefPDBaa=../03-CG/ref.pdb
 inpModesXYZ=../04-FRESEAN/evec_freq1_mode1-30_cg.xyz
 inpTRR=../02-MD/sample-NPT_prot_pbc.trr
 next=1
-nextDir=../06-metadyn
+nextDir=../06-resample
 #END INPUT
 
 files=(
