@@ -2,12 +2,12 @@
 #SBATCH -p general
 #SBATCH -G a100:1
 #SBATCH -N 1
-#SBATCH -c 12
-#SBATCH -t 2-00:00
+#SBATCH -c 16
+#SBATCH -t 0-12:00
 #SBATCH -J RESAMPLE
 
 # Working directory for where the topology and starting structure are
-workingDir=..
+workingDir=../..
 inpTOP=$workingDir/00-prep/topol.top
 inpGRO=$workingDir/01-em+equi/equi/equi.gro
 gmx=gmx_plumed
@@ -21,6 +21,6 @@ cd ..
  
 # Pull configuration every 5 ns
 mkdir snapshots
-$gmx trjconv -s run-NPT/sample-states.tpr -f run-NPT/sample-states.trr -pbc mol -sep -dt 5000.0 -ndec 8 -o snapshots/state_.gro << STOP >& trjconv.out
-0                                                                               
-STOP 
+$gmx trjconv -s run-NPT/sample-states.tpr -f run-NPT/sample-states.trr -pbc mol -sep -dt 5000.0 -ndec 8 -o snapshots/state_.gro <<END
+0
+END

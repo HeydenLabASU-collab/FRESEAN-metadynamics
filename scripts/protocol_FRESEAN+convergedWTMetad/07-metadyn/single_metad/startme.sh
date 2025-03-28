@@ -6,13 +6,15 @@
 #SBATCH -t 7-00:00
 #SBATCH -J METAD_0
 
+# FFTW IS REQUIRED (PLUMED)
+
 # Working directory containing starting topology
 workingDir=../..
 inpTOP=$workingDir/00-prep/topol.top
 gmx=gmx_plumed
 
 # Starting struct
-inpGRO=$workingDir/06-resample/snapshots/state_0.gro
+inpGRO=$workingDir/06-resample/snapshots/state_${replica}.gro
 
 # MetaD CV file
 inpPlumedPDB=$workingDir/05-ModeProj/plumed-mode-input.pdb

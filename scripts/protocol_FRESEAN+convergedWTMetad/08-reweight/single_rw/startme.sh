@@ -11,7 +11,7 @@
 gmx=gmx_plumed
 #GMX topology for protein
 workingDir=../..
-i=0
+i=${replica}
 inpTPRprot=$workingDir/07-metadyn/metadyn_$i/metadyn_prot.tpr
 inpTRRprot=$workingDir/07-metadyn/metadyn_$i/metadyn_prot_pbc.trr
 inpPlumedPDB=$workingDir/05-ModeProj/plumed-mode-input.pdb
