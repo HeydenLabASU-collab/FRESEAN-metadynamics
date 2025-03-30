@@ -1,0 +1,16 @@
+#This is a job file describing
+#exclusively static groups.
+#
+[static_groups]         1
+# static group 0
+name                    all
+chain(s)                *
+residue(s)              *
+atom(s)                 *
+residue_number(s)       *
+residue_range           *
+atom_number(s)          *
+atom_range              *
+#
+[dynamic_groups]        0
+[combination_groups]    0

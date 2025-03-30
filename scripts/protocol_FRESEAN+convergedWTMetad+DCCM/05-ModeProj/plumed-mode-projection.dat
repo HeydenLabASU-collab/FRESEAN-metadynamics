@@ -1,0 +1,5 @@
+# Import the file containing the eigenvectors
+PCAVARS REFERENCE=plumed-mode-input.pdb TYPE=OPTIMAL LABEL=pca
+
+# Print the displacement projections (col 2 and 3) and all the other variables you want
+PRINT ARG=pca.eig-1,pca.eig-2 FILE=plumed-mode-projection.out STRIDE=1000
