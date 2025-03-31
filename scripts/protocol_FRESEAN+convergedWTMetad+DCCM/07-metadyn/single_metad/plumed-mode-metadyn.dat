@@ -1,0 +1,15 @@
+PCAVARS REFERENCE=plumed-mode-input.pdb TYPE=OPTIMAL LABEL=pca
+
+METAD ...
+LABEL=metad
+ARG=pca.eig-1,pca.eig-2
+PACE=500
+HEIGHT=0.1
+BIASFACTOR=10
+SIGMA=0.001,0.001
+FILE=plumed-mode-metadyn.hills
+TEMP=300.0
+... METAD
+
+# monitor the two variables and the metadynamics bias potential
+PRINT  ARG=pca.eig-1,pca.eig-2,pca.residual,metad.bias FILE=plumed-mode-metadyn.out STRIDE=500

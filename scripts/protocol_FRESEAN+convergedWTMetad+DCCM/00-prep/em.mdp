@@ -1,0 +1,31 @@
+;
+;	User spoel (236)
+;	Wed Nov  3 17:12:44 1993
+;	Input file
+;
+constraints         =  none
+define              =  -DFLEXIBLE
+integrator          =  steep
+nsteps              =  1000
+nstxout             =  50
+;
+;	Energy minimizing stuff
+;
+emtol               =  1000
+emstep              =  0.01
+
+nstcomm             =  1
+nstcalcenergy       =  1
+
+coulombtype         =  PME
+rvdw                =  0.9
+rlist               =  0.9 
+rcoulomb            =  0.9
+fourierspacing      =  0.12
+pme_order           =  4
+ewald_rtol          =  1e-5
+
+Tcoupl              =  no
+Pcoupl              =  no
+gen_vel             =  no
+
