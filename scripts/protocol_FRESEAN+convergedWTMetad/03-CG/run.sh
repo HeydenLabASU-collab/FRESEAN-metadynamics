@@ -52,7 +52,7 @@ fi
 done
 
 #Generate a all-atom topology file (custom format) for the protein
-fresean mtop -p ${inpTOPprot} << STOP >& mtop.out
+fresean mtop << STOP >& mtop.out
 ${inpTOPprot}
 ${inpTOPprot}
 topol_prot-aa.mtop

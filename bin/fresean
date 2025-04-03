@@ -64,28 +64,6 @@ extract_subcommand(){
 mtop_subcommand(){
 	local OPTIND
 	programname=$EXE/convertGMXTOP
-	while getopts "p:" opt
-	do
-		case $opt in
-			p) p=${OPTARG};;
-		esac
-	done
-	if [ -z "$p" ]; then
-		mtop_usage
-		exit 1
-	fi
-
-	if [ ! -f "$p" ]; then
-    	printf "Error in user input:\nInvalid command-line options\n   In command-line option -m\n      File '$m' does not exist or is not acessible.\n"
-		exit 1
-	fi
-
-	isProtein=$(awk 'END{print substr($0,0,7)}' $p);
-	if [[ $isProtein != "Protein" ]]; then
-		echo "Protein topology must only contain protein. Remove solvent.";
-		exit 1;
-	fi
-
 	$programname
 }
 
