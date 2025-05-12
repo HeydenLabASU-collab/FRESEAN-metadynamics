@@ -16,7 +16,7 @@ Please read through each of the following sections to understand how to use this
 ## FRESEAN Installation
 Please follow the following instruction to install our suite of tools.
 ```
-git clone https://github.com/HeydenLabASU/FRESEAN-metadynamics.git
+git clone https://github.com/HeydenLabASU-collab/FRESEAN-metadynamics.git
 cd FRESEAN-metadynamics
 make
 make install
