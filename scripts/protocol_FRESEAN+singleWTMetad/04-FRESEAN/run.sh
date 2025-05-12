@@ -50,7 +50,7 @@ fi
 done
 
 #Generate input parameter file for FRESEAN mode analysis
-cat << STOP >& covar.inp
+cat << STOP >& matrix.inp
 #fnTop (custom .mtop file)
 ${inpMTOP}
 #fnCrd (CP2K position and velocity files)
@@ -87,15 +87,15 @@ STOP
 #Perform FRESEAN mode analysis for input trajectory
 #Here: we use 48 CPU cores --> see SBATCH flag: -c
 export OMP_NUM_THREADS=48
-fresean covar -f covar.inp >& covar.out
+fresean matrix -f matrix.inp >& matrix.out
 
 #Diagonalize velocity cross correlation matrix at all sampled frequencies
-fresean eigen -m covar_${outName}.mmat -n $nCorr >& eigen.out
+fresean eigen -m matrix_${outName}.mmat -n $nCorr >& eigen.out
 
 #Generate input parameter file to extract FRESEAN modes sampled at zero frequency
 cat << STOP >& extract.inp
 #fnEigVec (file containing eigenvectors in binary format)
-evec_covar_${outName}.mmat
+evec_matrix_${outName}.mmat
 #extractMode ( Mode 0 -> freqSel is in wavenumbers; Mode 1 -> freqSel is matrix index )
 1
 #freqSel (extract mode 0 -> Integer frequency in cm^-1;  mode 1 -> frequency index)
