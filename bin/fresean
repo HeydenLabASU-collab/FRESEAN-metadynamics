@@ -2,16 +2,16 @@
 
 EXE="$(cd "$(dirname "${BASH_SOURCE:-$0}")"&& pwd)"
 usage(){
-	printf "__________________________________\nWelcome to FRESEAN V1.0!\nPlease refer to README.md for an\nin-depth guide to FRESEAN V1.0.\nQuick Guide of Available Programs\n----------------------------------\n\nfresean freqs: Generate list of available frequencies given\n\t\tcorrelaiton function length.\n\nfresean mtop: Generate custom .mtop topology.\n\nfresean coarse: Generate spatially coarsened trajectory.\n\nfresean covar: Generate frequency dependent cross-correlation\n\t\tmatrices.\n\nfresean eigen: Generate FRESEAN modes from velocity\n\t\tcross-correlation matrices.\n\nfresean extract: Extract vibrational modes from .mmat format\n\t\tinto .xyz format.\n\nfresean xyz2pdb: Convert .xyz modes to .pdb modes.\n\nfresean avg: Average over many velocity cross-correlation\n\t\tmatrices.\n\n-------------------------------------\nQuestions about repository should\nbe directed to: masauer2@asu.edu.\n-------------------------------------\n"
+	printf "__________________________________\nWelcome to FRESEAN V1.0!\nPlease refer to README.md for an\nin-depth guide to FRESEAN V1.0.\nQuick Guide of Available Programs\n----------------------------------\n\nfresean freqs: Generate list of available frequencies given\n\t\tcorrelaiton function length.\n\nfresean mtop: Generate custom .mtop topology.\n\nfresean coarse: Generate spatially coarsened trajectory.\n\nfresean matrix: Generate frequency dependent cross-correlation\n\t\tmatrices.\n\nfresean eigen: Generate FRESEAN modes from velocity\n\t\tcross-correlation matrices.\n\nfresean extract: Extract vibrational modes from .mmat format\n\t\tinto .xyz format.\n\nfresean xyz2pdb: Convert .xyz modes to .pdb modes.\n\nfresean avg: Average over many velocity cross-correlation\n\t\tmatrices.\n\n-------------------------------------\nQuestions about repository should\nbe directed to: masauer2@asu.edu.\n-------------------------------------\n"
 }
 gen_list_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean freqs [-n <int>] [-t <float>] [-o <string>]\n" 1>&2; exit 1; }
 extract_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean extract [-f <string>]\n" 1>&2; exit 1; }
 mtop_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean mtop [-p <string>]\n" 1>&2; exit 1; }
 traj_coarse_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean coarse [-f <string>]\n" 1>&2; exit 1; }
-gen-modes_omp_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean covar [-f <string>]\n" 1>&2; exit 1; }
+gen-modes_omp_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean matrix [-f <string>]\n" 1>&2; exit 1; }
 eigen_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean eigen [-m <string>] [-n <int>]\n" 1>&2; exit 1; }
 eigVec_PLUMEDformat_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean xyz2pdb [-f <string>]\n" 1>&2; exit 1; }
-avg-covar_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean avg [-f <string>]\n" 1>&2; exit 1; }
+avg-matrix_usage(){ printf "Error in user input:\nInvalid command-line options\nUsage: fresean avg [-f <string>]\n" 1>&2; exit 1; }
 
 gen_list_subcommand(){
 	local OPTIND
@@ -89,7 +89,7 @@ coarse_subcommand(){
 	$programname ${f}
 }
 
-covar_subcommand(){
+matrix_subcommand(){
 	local OPTIND
 	programname=$EXE/gen-modes_omp
 	while getopts "f:" opt
@@ -145,8 +145,8 @@ case "$1" in
 		mtop_subcommand "${@:2}";;
 	coarse)
 		coarse_subcommand "${@:2}";;
-	covar)
-		covar_subcommand "${@:2}";;
+	matrix)
+		matrix_subcommand "${@:2}";;
 	eigen)
 		eigen_subcommand "${@:2}";;
 	*) 

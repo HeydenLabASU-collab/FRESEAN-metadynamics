@@ -644,7 +644,7 @@ int main(int argc, char *argv[])
                 printf(" - writing cross correlation matrix in binary format\n");
                 magic1=3*sizeof(int);
                 magic2=nDOF*nDOF*sizeof(double);
-                sprintf(fnOut2,"covar_%s.mmat",fnOut);
+                sprintf(fnOut2,"matrix_%s.mmat",fnOut);
                 out=fopen(fnOut2,"wb");
                 printf("   -> opening file: %s\n",fnOut2);fflush(stdout);
                 fwrite(&magic1,sizeof(int),1,out);
@@ -664,7 +664,7 @@ int main(int argc, char *argv[])
                 printf(" - writing cross correlation matrix in ASCII format\n");
                 magic1=3*sizeof(int);
                 magic2=nDOF*nDOF*sizeof(double);
-                sprintf(fnOut2,"covar_%s.mmat",fnOut);
+                sprintf(fnOut2,"matrix_%s.mmat",fnOut);
                 out=fopen(fnOut2,"w");
                 fprintf(out,"%d\n%d %d %d\n%d\n",magic1,nCorr,nDOF,nDOF,magic1);
                 for(i=0;i<nCorr;i++) {

@@ -13,4 +13,4 @@ case $yn in
                 exit 1;;
 esac
 
-rm *.mmat *mmat.dat *xyz covar.inp extract.inp *.out
+rm *.mmat *mmat.dat *xyz matrix.inp extract.inp *.out
