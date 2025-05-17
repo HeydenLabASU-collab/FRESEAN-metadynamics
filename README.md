@@ -23,6 +23,11 @@ make install
 make clean
 source ~/.bashrc
 ```
+## FRESEAN Usage
+- To get started, run `fresean` on the command line to see available tools. <br>
+- - To understand required input formats, run `fresean -h` <br>
+To see detailed information about each subroutine, run `fresean subroutine -h`, where `subroutine` is replaced with the subroutine name. <br><br>
+
 If you have already set up GROMACS 2022.5 with Plumed 2.8, please proceed to the **FRESEAN Toolbox Programs** section to get an overview of the provided tools. Proceed to the **Provided Protocols-HEWL Example** section to get an overview on provided scripts.
 </details>
 
