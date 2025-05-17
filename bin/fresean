@@ -2,7 +2,24 @@
 
 EXE="$(cd "$(dirname "${BASH_SOURCE:-$0}")"&& pwd)"
 usage(){
-	printf "__________________________________\nWelcome to FRESEAN V1.0!\nPlease refer to README.md for an\nin-depth guide to FRESEAN V1.0.\nQuick Guide of Available Programs\n----------------------------------\n\nfresean freqs: Generate list of available frequencies given\n\t\tcorrelaiton function length.\n\nfresean mtop: Generate custom .mtop topology.\n\nfresean coarse: Generate spatially coarsened trajectory.\n\nfresean matrix: Generate frequency dependent cross-correlation\n\t\tmatrices.\n\nfresean eigen: Generate FRESEAN modes from velocity\n\t\tcross-correlation matrices.\n\nfresean extract: Extract vibrational modes from .mmat format\n\t\tinto .xyz format.\n\nfresean xyz2pdb: Convert .xyz modes to .pdb modes.\n\nfresean avg: Average over many velocity cross-correlation\n\t\tmatrices.\n\n-------------------------------------\nQuestions about repository should\nbe directed to: masauer2@asu.edu.\n-------------------------------------\n"
+	printf "__________________________________\n\
+Welcome to FRESEAN V1.0!\n\
+Please refer to README.md for an\nin-depth guide to FRESEAN V1.0.\n\
+Quick Guide of Available Programs\n\
+----------------------------------\n\n\
+fresean freqs: Generate list of available frequencies given\n\
+\t\tcorrelaiton function length.\n\n\
+fresean mtop: Generate custom .mtop topology.\n\n\
+fresean coarse: Generate spatially coarsened trajectory.\n\n\
+fresean matrix: Generate frequency dependent cross-correlation\n\
+\t\tmatrices.\n\nfresean eigen: Generate FRESEAN modes from velocity\n\
+\t\tcross-correlation matrices.\n\n\
+fresean extract: Extract vibrational modes from .mmat format\n\
+\t\tinto .xyz format.\n\nfresean avg: Average over many velocity cross-correlation\n\t\tmatrices.\
+\n\n-------------------------------------\nSubroutine info (input file format, usage, description)\n\
+available with the command: fresean [subroutine_name] -h\n-------------------------------------\n\
+-------------------------------------\nQuestions about repository should\
+\nbe directed to: masauer2@asu.edu or mheyden1@asu.edu.\n-------------------------------------\n"
 }
 
 avg-matrix_printTitle(){ printf " -----------------------------------------------\n              fresean avg subroutine \n ------------------------------------------------\n\
