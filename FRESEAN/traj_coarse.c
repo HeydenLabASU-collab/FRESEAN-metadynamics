@@ -14,10 +14,21 @@
 #include "../include/align.h"
 
 int printTitle() {
-        printf("Generate a coarse grained trajectory for all atom simulation\n");
-	printf("Use for coarse grain FRESEAN.");
-	printf("Be aware. Currently only works for systems with single chain proteins.\n");
-        return 0;
+	printf("THE PURPOSE OF THIS PROGRAM IS TO GENERATE\n");
+	printf("A COARSE-GRAINED REPRESENTATION OF AN\n");
+	printf("ALL -ATOM TRAJECTORY.\n");
+	printf("THE COARSE-GRAINED REPRESENTATION IS\n");
+	printf("DEFINED AS TWO CENTER OF MASS BEADS FOR.\n");
+	printf("EACH AMINO ACID (ONE BACKBONE/ONE SIDECHAIN).\n");
+	printf("Version 1: November 1, 2023\n");
+	printf("Author:\n");
+	printf("Michael A. Sauer\n");
+	printf("School of Molecular Sciences\n");
+	printf("Arizona State University\n");
+	printf("Tempe, AZ, USA\n");
+	printf("e-mail: masauer2@asu.edu\n");
+	printf("\n");
+    return 0;
 }
 
 int getLineFromCOM(FILE *in,char *buffer,int max)
@@ -31,8 +42,10 @@ int getLineFromCOM(FILE *in,char *buffer,int max)
 }
 
 int printKeys() {
-        printf("fnTop\nfnCrd\nfnVel (if format xyz,crd,dcd)\n");
-        printf("nRead\nnSample\nfnOutTraj\nfnOutTopol\n");
+        printf("fnTop (topology file [.mtop]) \nfnCrd\nfnVel (if format xyz,crd,dcd)\n");
+        printf("fnJob (provided [.job] file)\analyzeGrp (atom group in job file to perform analysis on)\n");
+		printf("nRead (Number of frames to read)\nnSample (dFrame)\nfnOutTraj (Output coarse-grain trajectory [.gro])\n");
+		printf("fnOutTopol (Output coarse-grain topology [.mtop])\n");
         return 0;
 }
 
@@ -529,8 +542,6 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-
-	// FIX: HARD CODED SIM BOX SIZE?
 	fprintf(out,"%.5f %.5f %.5f\n", boxbuffer[0].a.x/10, boxbuffer[0].b.y/10, boxbuffer[0].c.z/10);
 	printf("step %d of %d%c",i+1,nRead,(char)13); fflush(stdout);
    	}
