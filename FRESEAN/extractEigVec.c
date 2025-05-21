@@ -58,7 +58,7 @@ int getInput(char *fnCOM,char *fnEigVec,int *freqSel, float *timestep, int *mode
 
 	getLineFromCOM(io,buffer,300);
         sscanf(buffer,"%f",timestep);
-        printf("%2d -> read %20s : %f\n",i,"timestep",timestep[0]);i++;
+        printf("%2d -> read %20s : %f\n",i,"trajSavingStep",timestep[0]);i++;
 
 	getLineFromCOM(io,buffer,300);
         sscanf(buffer,"%d",modeStart);
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 	fread(&nCorr,sizeof(int),1,io);
 
 	// Determine the frequency resolution
-	df = 33/((2*nCorr-1)*timestep);
+	df = 33.3564/((2*nCorr-1)*timestep);
 
 	// If extractMode is set to 0, then we will take in freqSel as an integer corresponding to the desired frequency
 	// Since the frequency resolution is most likely to be a floating point value
