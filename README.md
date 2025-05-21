@@ -277,7 +277,7 @@ This file is utilized by `fresean matrix`. There are two files provided in `inp-
 - ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png)`nCorr`: Number of points in the correlation function. <br>
 - ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `winSigma`: Length of Gaussian smoothing function. <br>
 - ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `binaryMatrix`: Format of matrix output. 0 for ASCII, 1 for binary `.mmat`. Recommend option `1` due to storage cost of ASCII format. <br>
-- ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `doGenModes`: Perform Jacobi diagonalization. Set to option `0` if using [FRESEAN Toolbox Workflow](#FRESEAN-Toolbox-Workflow).
+- ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `doGenModes`: Compute generalized normal modes through minimization of off-diagonal matrix elements simultaenously at all frequencies as described in G. Mathias & M. Baer, J. Chem. Theory Comput. 2011, 7, 2028-2039. Set to `0` if using [FRESEAN Toolbox Workflow](#FRESEAN-Toolbox-Workflow).
 - ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `convergence`: Convergence criteria of Jacobi diagonalization. 
 - ![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `maxIter`: Maximum number of swaps for Jacobi diagonalization.
 - ![#c5f015](https://placehold.co/15x15/c5f015/c5f015.png) `fnOut`: Name of output `.mmat` file.
