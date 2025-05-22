@@ -467,12 +467,28 @@ case "$1" in
 	avg)
 		avg_subcommand "${@:2}";;
 	-h)
-printf " -----------------------------------------------\n INPUT FILE [.inp] FORMAT:\n -----------------------------------------------\n
+printf " 
+____________________________________________________________________\n\
+Welcome to FRESEAN V1.0!\n\
+Please refer to README.md for an in-depth guide to FRESEAN V1.0.\n\n\
+Below is guidance on how to construct input files [.inp] and job files [.job] \n\
+required by fresean subcommands.\n\
+--------------------------------------------------------------------\n
+
+Below is guidance on how to construct input files [.inp] and job files [.job] \n\
+required by fresean subcommands. \n\
+----------------------------------------------------------------------------------------------\n\
+----------------------------------------------------------------------------------------------\n\
+                               INPUT FILE [.inp] FORMAT:\n\
+----------------------------------------------------------------------------------------------\n\
+----------------------------------------------------------------------------------------------\n\
 A plain text file where inputs are provided in a newline-delimited format in a fixed order.\n\
 The correct parameter order can be found by running the FRESEAN subcommand with the -h flag.\n\
 An example input file for FRESEAN COARSE is shown below:\n\
 \n\
-Lines starting with \"#\" are header lines and are ignored by the subcommand.\n\n-----------------------------------------------\n\
+Lines starting with \"#\" are header lines and are ignored by the subcommand.\n\n\
+example [.inp] file below\n\
+-----------------------------------------------\n\
 #fnTop (topology file [.mtop])\n\
 example_topology.top\n\
 #fnCrd\n\
@@ -488,11 +504,18 @@ static.job\n\
 1\n\
 #fnOutTraj (output coarse-grain trajectory [.gro])\n\
 output_trajectory.gro\n\
-#fnOutTopol (output coarse-grain topology [.mtop])\noutput_topology.mtop\n\n\
------------------------------------------------\n JOB FILE [.job] FORMAT:\n -----------------------------------------------\n
+#fnOutTopol (output coarse-grain topology [.mtop])\noutput_topology.mtop\n-----------------------------------------------\n\n\
+----------------------------------------------------------------------------------------------\n\
+----------------------------------------------------------------------------------------------\n\
+                               JOB FILE [.job] FORMAT:\n\
+----------------------------------------------------------------------------------------------\n\
+----------------------------------------------------------------------------------------------\n\
+
 A plain text file where atom groups are provided.\n\
 An example job file defining one atom group containing all atoms is shown below:\n\
-Modify group ranges to create new atom groups.\n\n-----------------------------------------------\n\
+Modify group ranges to create new atom groups.\n\n\
+example [.job] file below\n\
+-----------------------------------------------\n\
 #This is a job file describin\n\
 #exclusively static groups.\n\
 #\
@@ -508,7 +531,7 @@ atom_number(s)          *\n\
 atom_range              *\n\
 #\n\
 [dynamic_groups]        0\n\
-[combination_groups]    0\n\
+[combination_groups]    0\n-----------------------------------------------\
  \n\n";;
 		
 	*) 
