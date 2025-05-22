@@ -14,16 +14,14 @@ TEMP=300.0
 RESTART=YES
 ... METAD
 
-# Index file with only c alpha atoms. Use to calculate Rg.
+# Use index file to select C-alpha atoms and calculate Rg.
 CA: GROUP NDX_FILE=groups.ndx NDX_GROUP=C-alpha
-rg: GYRATION TYPE=RADIUS ATOMS=CA
+rg1: GYRATION TYPE=RADIUS ATOMS=CA
 
-# Define the pincer angle.
-G1: COM ATOMS=422-480,1639-1724
-G2: COM ATOMS=1347-1397
-G3: COM ATOMS=663-700,759-784
-pincerangle: ANGLE ATOMS=G1,G2,G3
+# Use index file to select all protein atoms and calculate Rg.
+prot: GROUP NDX_FILE=groups.ndx NDX_GROUP=Protein
+rg2: GYRATION TYPE=RADIUS ATOMS=prot
 
 # Print each of the desired quantities to a file. Can manually reweight.
 # Weight of frame i is given by w_i \propto exp(V/kT). V is given in the reweight file as metad.bias.
-PRINT ARG=pca.eig-1,pca.eig-2,pincerangle,rg,pca.residual,metad.bias FILE=plumed-reweight-CV.out STRIDE=1
+PRINT ARG=pca.eig-1,pca.eig-2,,rg1,rg2,pca.residual,metad.bias FILE=plumed-reweight-CV.out STRIDE=1
