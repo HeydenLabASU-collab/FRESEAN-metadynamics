@@ -92,7 +92,7 @@ Tempe, AZ, USA\n\
 e-mail: mheyden1@asu.edu\n\n" 1>&2; }
 
 mtop_printTitle(){ printf " -----------------------------------------------\n              fresean mtop subroutine \n ------------------------------------------------\n\
-THE PURPOSE OF THIS PROGRAM IS TO WRITE A CUSTOM TOPOLOGY FILE (.MTOP) THAT IS RECOGNIZED BY OTHER SUBROUTINES." 1>&2; }
+THE PURPOSE OF THIS PROGRAM IS TO WRITE A CUSTOM TOPOLOGY FILE (.MTOP)\nTHAT IS RECOGNIZED BY OTHER SUBROUTINES.\n" 1>&2; }
 
 traj_coarse_printTitle(){ printf " -----------------------------------------------\n           fresean coarse subroutine \n ------------------------------------------------\n\
 THE PURPOSE OF THIS PROGRAM IS TO GENERATE\n\
