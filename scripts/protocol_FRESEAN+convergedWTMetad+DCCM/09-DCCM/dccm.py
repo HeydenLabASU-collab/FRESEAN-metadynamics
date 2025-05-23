@@ -141,4 +141,126 @@ avgDCCM /= nReplicas
 # write average DCCM to file
 np.savetxt(DCCM_all, avgDCCM, fmt="%10.4f", delimiter=",")
 
+# %%
+import numpy as np
+import matplotlib.pyplot as plt
+
+# %%
+dccm = np.loadtxt(DCCM_all, delimiter=",")
+
+# %%
+plt.figure(figsize=(8, 6))
+im = plt.imshow(dccm, cmap='bwr', vmin=-1, vmax=1)
+plt.gca().invert_yaxis()
+plt.colorbar(im, label='Correlation')
+plt.title('Dynamic Cross Correlation Matrix (DCCM)')
+plt.xlabel('Residue Index')
+plt.ylabel('Residue Index')
+plt.tight_layout()
+plt.savefig("dccm.png", dpi=300)
+
+# %%
+pair1 = np.unravel_index(np.argmin(dccm), dccm.shape)
+col0 = np.abs(dccm[:, pair1[0]])
+col1 = np.abs(dccm[:, pair1[1]])
+least_correlated = np.argmin(col0 + col1)
+anti_correlated = np.argmin(dccm[:, least_correlated])
+pair2=[least_correlated, anti_correlated]
+
+# %%
+domain1 = np.where(dccm[pair1[0]] > 0.5)[0]
+domain2 = np.where(dccm[pair1[1]] > 0.5)[0]
+domain3 = np.where(dccm[pair2[0]] > 0.5)[0]
+domain4 = np.where(dccm[pair1[1]] > 0.5)[0]
+
+# %%
+plt.figure(figsize=(8,5))
+x = np.arange(dccm.shape[1])
+y1 = dccm[pair1[0]]
+y2 = dccm[pair1[1]]
+
+plt.plot(x, y1, marker='o', markersize=3, color='blue', label=f'DCCM row {pair1[0]+1}')
+plt.plot(x, y2, marker='o', markersize=3, color='red', label=f'DCCM row {pair1[1]+1}')
+
+# Fill area above y=0.5 for y1
+plt.fill_between(x, 0.5, y1, where=(y1 > 0.5), color='blue', alpha=0.3)
+# Fill area above y=0.5 for y2
+plt.fill_between(x, 0.5, y2, where=(y2 > 0.5), color='red', alpha=0.3)
+
+plt.xlabel('Residue Index')
+plt.ylabel('Correlation')
+plt.title('row-wise correlation')
+plt.grid(True)
+plt.legend(loc='center', bbox_to_anchor=(0.7, 0.1))
+plt.xlim(x.min(), x.max())
+plt.ylim(-0.75, 1.0)
+plt.tight_layout()
+plt.savefig("pair1.png", dpi=300)
+
+# %%
+plt.figure(figsize=(8,5))
+x = np.arange(dccm.shape[1])
+y1 = dccm[pair2[0]]
+y2 = dccm[pair2[1]]
+
+plt.plot(x, y1, marker='o', markersize=3, color='blue', label=f'DCCM row {pair2[0]+1}')
+plt.plot(x, y2, marker='o', markersize=3, color='red', label=f'DCCM row {pair2[1]+1}')
+
+# Fill area above y=0.5 for y1
+plt.fill_between(x, 0.5, y1, where=(y1 > 0.5), color='blue', alpha=0.3)
+# Fill area above y=0.5 for y2
+plt.fill_between(x, 0.5, y2, where=(y2 > 0.5), color='red', alpha=0.3)
+
+plt.xlabel('Residue Index')
+plt.ylabel('Correlation')
+plt.title('row-wise correlation')
+plt.grid(True)
+plt.legend(loc='center', bbox_to_anchor=(0.7, 0.1))
+plt.xlim(x.min(), x.max())
+plt.ylim(-0.75, 1.0)
+plt.tight_layout()
+plt.savefig("pair2.png", dpi=300)
+
+# %%
+def generate_plumed_distance_input(domain1, domain2, domain3, domain4):
+    # Convert to 1-based indexing for PLUMED
+    group1_indices = ",".join(str(i+1) for i in domain1)
+    group2_indices = ",".join(str(i+1) for i in domain2)
+    group3_indices = ",".join(str(i+1) for i in domain3)
+    group4_indices = ",".join(str(i+1) for i in domain4)
+    plumed_input = (
+        "#Reference file containing eigenvectors\n"
+        "PCAVARS REFERENCE=plumed-mode-input.pdb TYPE=OPTIMAL LABEL=pca\n"
+        "\n"
+        "# Go through metadynamics trajectory and get the weight every frame\n"
+        "METAD ...\n"
+        "LABEL=metad\n"
+        "ARG=pca.eig-1,pca.eig-2\n"
+        "PACE=10000\n"
+        "HEIGHT=0.0\n"
+        "BIASFACTOR=10\n"
+        "SIGMA=0.001,0.001\n"
+        "FILE=plumed-mode-metadyn.hills\n"
+        "TEMP=300.0\n"
+        "RESTART=YES\n"
+        "... METAD\n"
+        "\n"
+        f"g1 : COM ATOMS={group1_indices}\n"
+        f"g2 : COM ATOMS={group2_indices}\n"
+        "d1: DISTANCE ATOMS=g1,g2\n"
+        "\n"
+        f"g3 : COM ATOMS={group3_indices}\n"
+        f"g4 : COM ATOMS={group4_indices}\n"
+        "d2: DISTANCE ATOMS=g3,g4\n"
+        "\n"
+        "# Print each of the desired quantities to a file. Can manually reweight.\n"
+        "# Weight of frame i is given by w_i proportional to exp(V/kT). V is given in the reweight file as metad.bias.\n"
+        "PRINT ARG=pca.eig-1,pca.eig-2,d1,d2,pca.residual,metad.bias FILE=plumed-reweight-CV.out STRIDE=1\n"
+    )
+    with open("plumed-reweight-CV.dat", "w") as f:
+        f.write(plumed_input)
+
+# %%
+generate_plumed_distance_input(domain1, domain2, domain3, domain4)
+
 
