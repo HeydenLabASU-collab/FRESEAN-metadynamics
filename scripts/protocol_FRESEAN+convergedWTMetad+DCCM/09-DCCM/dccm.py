@@ -4,6 +4,7 @@ import numpy as np
 import unwrap as pbc
 import align as fit
 from tqdm import *
+import matplotlib.pyplot as plt
 
 # %%
 nReplicas = 20
@@ -142,11 +143,12 @@ avgDCCM /= nReplicas
 np.savetxt(DCCM_all, avgDCCM, fmt="%10.4f", delimiter=",")
 
 # %%
-import numpy as np
-import matplotlib.pyplot as plt
+dccm = np.loadtxt(DCCM_all, delimiter=",")
 
 # %%
-dccm = np.loadtxt(DCCM_all, delimiter=",")
+u = mda.Universe(TOPOL[0])
+# Select C-alpha atoms
+ca = u.select_atoms("protein and name CA")
 
 # %%
 plt.figure(figsize=(8, 6))
@@ -168,10 +170,10 @@ anti_correlated = np.argmin(dccm[:, least_correlated])
 pair2=[least_correlated, anti_correlated]
 
 # %%
-domain1 = np.where(dccm[pair1[0]] > 0.5)[0]
-domain2 = np.where(dccm[pair1[1]] > 0.5)[0]
-domain3 = np.where(dccm[pair2[0]] > 0.5)[0]
-domain4 = np.where(dccm[pair1[1]] > 0.5)[0]
+domain1 = ca.atoms.indices[np.where(dccm[pair1[0]] > 0.5)[0]]
+domain2 = ca.atoms.indices[np.where(dccm[pair1[1]] > 0.5)[0]]
+domain3 = ca.atoms.indices[np.where(dccm[pair2[0]] > 0.5)[0]]
+domain4 = ca.atoms.indices[np.where(dccm[pair1[1]] > 0.5)[0]]
 
 # %%
 plt.figure(figsize=(8,5))
