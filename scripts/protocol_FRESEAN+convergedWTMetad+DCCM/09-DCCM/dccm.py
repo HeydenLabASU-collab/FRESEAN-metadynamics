@@ -162,7 +162,25 @@ plt.tight_layout()
 plt.savefig("dccm.png", dpi=300)
 
 # %%
-pair1 = np.unravel_index(np.argmin(dccm), dccm.shape)
+# pair1 = np.unravel_index(np.argmin(dccm), dccm.shape)
+# col0 = np.abs(dccm[:, pair1[0]])
+# col1 = np.abs(dccm[:, pair1[1]])
+# least_correlated = np.argmin(col0 + col1)
+# anti_correlated = np.argmin(dccm[:, least_correlated])
+# pair2 = [least_correlated, anti_correlated]
+
+# %%
+pos = []
+neg = []
+for row in dccm:
+    pos.append(np.sum(row[np.where(row>0)[0]]))
+    neg.append(np.sum(row[np.where(row<0)[0]]))
+pos = np.array(pos)
+neg = np.array(neg)
+diff = pos - neg
+r1 = np.argmax(diff)
+r2 = np.argmin(dccm[r1])
+pair1 = [r1, r2]
 col0 = np.abs(dccm[:, pair1[0]])
 col1 = np.abs(dccm[:, pair1[1]])
 least_correlated = np.argmin(col0 + col1)
