@@ -167,7 +167,7 @@ col0 = np.abs(dccm[:, pair1[0]])
 col1 = np.abs(dccm[:, pair1[1]])
 least_correlated = np.argmin(col0 + col1)
 anti_correlated = np.argmin(dccm[:, least_correlated])
-pair2=[least_correlated, anti_correlated]
+pair2 = [least_correlated, anti_correlated]
 
 # %%
 domain1 = ca.atoms.indices[np.where(dccm[pair1[0]] > 0.5)[0]]
