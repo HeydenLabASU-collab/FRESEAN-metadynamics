@@ -146,7 +146,7 @@ np.savetxt(DCCM_all, avgDCCM, fmt="%10.4f", delimiter=",")
 dccm = np.loadtxt(DCCM_all, delimiter=",")
 
 # %%
-u = mda.Universe(TOPOL[0])
+u = mda.Universe(TOPOL[0],TRAJ[0])
 # Select C-alpha atoms
 ca = u.select_atoms("protein and name CA")
 
