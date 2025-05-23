@@ -173,7 +173,7 @@ pair2=[least_correlated, anti_correlated]
 domain1 = ca.atoms.indices[np.where(dccm[pair1[0]] > 0.5)[0]]
 domain2 = ca.atoms.indices[np.where(dccm[pair1[1]] > 0.5)[0]]
 domain3 = ca.atoms.indices[np.where(dccm[pair2[0]] > 0.5)[0]]
-domain4 = ca.atoms.indices[np.where(dccm[pair1[1]] > 0.5)[0]]
+domain4 = ca.atoms.indices[np.where(dccm[pair2[1]] > 0.5)[0]]
 
 # %%
 plt.figure(figsize=(8,5))
