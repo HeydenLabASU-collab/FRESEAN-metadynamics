@@ -136,7 +136,7 @@ for r in range(nReplicas):
 print(f'computing average DCCM for all replicas')
 avgDCCM = np.zeros((nRes, nRes))
 for r in range(nReplicas):
-    avgDCCM += np.loadtxt(f"dccm_{r}.dat", delimiter=",")
+    avgDCCM += np.loadtxt(DCCM[r], delimiter=",")
 avgDCCM /= nReplicas
 # write average DCCM to file
 np.savetxt(DCCM_all, avgDCCM, fmt="%10.4f", delimiter=",")
