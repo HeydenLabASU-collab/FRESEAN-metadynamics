@@ -53,10 +53,11 @@ int getLineFromCOM(FILE *in,char *buffer,int max)
 }
 
 int printKeys() {
-        printf("fnTop\nfnCrd\nfnVel (if format xyz,crd,dcd)\nfnJob\n");
-        printf("nRead\nanalysisInterval\n");
-        printf("fnRef\nalignGrp\nanalyzeGrp\nwrap\n");
-        printf("nCorr\nwinSigma\nbinaryMatrix\ndoGenModes\nconvergence\nmaxIter\nfnOut\n");
+        printf("fnTop (topology file [.mtop])\nfnCrd\nfnVel (if format xyz,crd,dcd)\nfnJob (atom group file [.job])\n");
+        printf("nRead (Number of frames to read)\nanalysisInterval (dFrame)\n");
+        printf("fnRef (reference coordinate file)\nalignGrp (atom group to align trajectory to, from job file)\nanalyzeGrp (atom group to perform analysis on, from job file)\nwrap (atom group to wrap trajectory on, from job file)\n");
+        printf("nCorr (number of points in time correlation function)\nwinSigma (width of smoothing funciton)\nbinaryMatrix (0 for human readable, 1 for binary matrix)\ndoGenModes (0 for no, 1 for yes)\n");
+        printf("convergence (convergence value for generalized normal modes)\nmaxIter (maximum iterations for generalized normal modes)\nfnOut (output matrix file)\n");
         return 0;
 }
 
