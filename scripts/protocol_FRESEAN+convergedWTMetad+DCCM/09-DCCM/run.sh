@@ -8,7 +8,7 @@
 
 module load mamba/latest
 source deactivate
-source activate mda
+source activate FRESEAN-python-env
 
 cd ctypes
 ./compile.sh

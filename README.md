@@ -12,6 +12,7 @@ Please read through each of the following sections to understand how to use this
 - python 3.12 (https://www.python.org/downloads/)
 - gromacs 2022.5 (https://manual.gromacs.org/2022.5/download.html)
 - plumed 2.8 (https://www.plumed.org/download)
+- conda (https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
 ## FRESEAN Installation
 Please follow the following instruction to install our suite of tools.
@@ -21,6 +22,7 @@ cd FRESEAN-metadynamics
 make
 make install
 make clean
+conda env create -f environment.yml
 source ~/.bashrc
 ```
 If you have already set up GROMACS 2022.5 with Plumed 2.8, please proceed to the **FRESEAN Toolbox Programs** section to get an overview of the provided tools. Proceed to the **Provided Protocols-HEWL Example** section to get an overview on provided scripts.
