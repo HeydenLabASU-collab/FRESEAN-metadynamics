@@ -1,0 +1,5 @@
+# Extract the charges and masses from a tpr file
+# Atom range should be from 1 to the total number of atoms in the tpr file
+
+protein: GROUP ATOMS=@mdatoms
+DUMPMASSCHARGE FILE=mass+charge.dat ATOMS=protein

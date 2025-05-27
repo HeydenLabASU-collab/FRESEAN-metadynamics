@@ -9,6 +9,8 @@
 # FFTW is required
 # Python3 with numpy is required
 
+module load mamba/latest
+source activate FRESEAN-python-env
 ############################
 # CHECK NUMPY INSTALLATION #
 ############################
