@@ -19,7 +19,7 @@ int printTitle() {
 
 int main(int argc, char* argv[]){
     if(argc != 4){
-		printf("\n------------------------------------------------\n\nWrong number of inputs. \nThe correct usage of this program is as follows.\n\n ./index_waters nCorr timestep (ps) output_file.\n\n------------------------------------------------\n");
+        printf("usage: ./gen_list nCorr timestep (ps) output_file\n");
 		exit(0);
 	}
 

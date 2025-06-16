@@ -35,7 +35,7 @@ int getLineFromCOM(FILE *in,char *buffer,int max)
 }
 
 int printKeys() {
-        printf("nFiles\nfnList\nfnOut\n");
+        printf("nFiles (number of files to average over)\nfnList (list of individual matrix files, newline delimited)\nfnOut (average matrix output file)\n");
         return 0;
 }
 
