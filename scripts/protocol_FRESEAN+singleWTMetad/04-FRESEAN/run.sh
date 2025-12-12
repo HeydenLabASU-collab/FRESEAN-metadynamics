@@ -31,7 +31,7 @@ outName=cg
 #trajectory time step (picoseconds)
 TRJtimestep=0.020
 next=1
-nextDir=../05-ModeProj
+nextDir=../05-backmap
 #END INPUT
 
 files=(
