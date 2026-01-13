@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -p general
+#SBATCH -p public
 #SBATCH -G a100:1
 #SBATCH -N 1
 #SBATCH -c 12
