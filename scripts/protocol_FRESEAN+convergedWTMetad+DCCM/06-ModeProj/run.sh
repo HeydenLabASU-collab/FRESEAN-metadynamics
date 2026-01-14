@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -p general
+#SBATCH -p public
 #SBATCH -N 1
 #SBATCH -c 1
 #SBATCH -t 0-01:00                  # wall time (D-HH:MM)
