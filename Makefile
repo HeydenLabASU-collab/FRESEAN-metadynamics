@@ -52,7 +52,7 @@ eigen: build/eigen.o
 	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/top.o ${SRCDIR}/alloc.o ${SRCDIR}/mol.o ${SRCDIR}/job.o ${SRCDIR}/select.o ${SRCDIR}/qsort.o ${SRCDIR}/align.o ${SRCDIR}/grps.o build/eigen.o -lgsl -lgslcblas -fopenmp -lm -o bin/eigen
 
 build/eigen.o: ${CODE}/eigen.c
-	${GCC} -c ${CODE}/eigen.c -o build/eigen.o -fopenmp -lfft3
+	${GCC} -c ${CODE}/eigen.c -o build/eigen.o -fopenmp
 
 extract: build/extractEigVec.o
 	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/alloc.o build/extractEigVec.o -lm -o bin/extract
