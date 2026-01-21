@@ -5,7 +5,7 @@ channels:
 dependencies:
   - matplotlib=3.10
   - numpy=2.2.6
-  - pandas=3.0.0
   - pip=25.1.1=pyh145f28c_0
   - pip:
       - mdanalysis==2.7.0
+      - pandas==3.0.0
