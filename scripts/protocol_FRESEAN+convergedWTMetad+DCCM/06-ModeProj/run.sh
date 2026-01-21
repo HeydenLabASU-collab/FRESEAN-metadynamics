@@ -3,7 +3,7 @@
 #SBATCH -p public
 #SBATCH -N 1
 #SBATCH -c 1
-#SBATCH -t 0-01:00                  # wall time (D-HH:MM)
+#SBATCH -t 0-04:00                  # wall time (D-HH:MM)
 #SBATCH -J PROJ
 
 # FFTW is required
