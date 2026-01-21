@@ -22,5 +22,5 @@ EIGVEC_D1_df = pd.DataFrame(EIGVEC_D1, columns=["Mode 7", "Mode 8"])
 
 range_mode7 = np.std(EIGVEC_D1_df["Mode 7"])
 range_mode8 = np.std(EIGVEC_D1_df["Mode 8"])
-print(f"Standard Deviation of Mode 7 Displacement Projection: {range_mode7} nm")
-print(f"Standard Deviation of Mode 8 Displacement Projection: {range_mode8} nm")
+print(f"Standard Deviation of Mode 7 Displacement Projection: {range_mode7}")
+print(f"Standard Deviation of Mode 8 Displacement Projection: {range_mode8}")
