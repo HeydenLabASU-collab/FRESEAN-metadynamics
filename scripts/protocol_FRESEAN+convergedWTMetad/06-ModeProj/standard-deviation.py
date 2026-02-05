@@ -14,7 +14,7 @@ pts=int(sys.argv[2])
 
 # Read in data and store in dataframe
 EIGVEC_D1 = np.zeros((num_modes,pts))
-EIGVEC_D1 = np.loadtxt(f'{projDispFile}', dtype=float, comments=['#'], usecols=[1,2])
+EIGVEC_D1 = np.loadtxt(projDispFile, dtype=float, comments=['#'], usecols=[1,2])
 
 # Convert numpy array to pandas dataframe
 # Convert from Angstroms to nanometers
