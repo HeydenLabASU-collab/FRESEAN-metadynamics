@@ -4,7 +4,7 @@ METAD ...
 LABEL=metad
 ARG=pca.eig-1,pca.eig-2
 PACE=500
-HEIGHT=0.1
+HEIGHT=1.0
 BIASFACTOR=10
 SIGMA=XXX,YYY
 FILE=plumed-mode-metadyn.hills
