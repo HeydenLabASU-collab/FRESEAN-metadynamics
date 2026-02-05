@@ -117,9 +117,32 @@ bins=200
 #print standard deviations of displacement fluctuations along FRSEAN modes
 python standard-deviation.py plumed-mode-projection.out $bins >& standard-deviation.out
 
+#Replace PLUMED input files w correct sigma values
+vals_file="standard-deviation.out"
+metad_file="../07-metadyn/plumed-mode-metadyn.dat"
+rw_file="../08-reweight/plumed-reweight-CV.dat"
+
+# Read first two lines
+line1=$(awk '/Mode 7 Displacement Projection/ {print $(NF-1); exit}' $vals_file)
+line2=$(awk '/Mode 8 Displacement Projection/ {print $(NF-1); exit}' $vals_file)
+
+# Escape for sed replacement (handles \, &, and delimiter |)
+escape_sed_repl() {
+  printf '%s' "$1" | sed 's/[\/&|\\]/\\&/g'
+}
+
+r1="$(escape_sed_repl "$line1")"
+r2="$(escape_sed_repl "$line2")"
+
+echo "Replacing input files with following gaussian widths for mode 7 and mode 8: ${r1} and ${r2}"
+
+# Replace XXX -> line1 and YYY -> line2
+sed -i -e "s|XXX|$r1|g" -e "s|YYY|$r2|g" "$metad_file"
+sed -i -e "s|XXX|$r1|g" -e "s|YYY|$r2|g" "$rw_file"
+
 #Start next part of the project if next=1
 if [ ${next} -eq 1 ]; then
-  if [ -f plumed-mode-projection.dat ]; then
+  if [ -f plumed-mode-projection.out ]; then
     if [ -d ${nextDir} ]; then
       curDir=`pwd`
       cd ${nextDir}

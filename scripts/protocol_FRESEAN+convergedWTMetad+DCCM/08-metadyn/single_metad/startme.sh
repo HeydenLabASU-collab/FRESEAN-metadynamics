@@ -38,24 +38,6 @@ exit
 fi
 done
 
-vals_file="../../06-ModeProj/std_dev.txt"
-in_file="plumed-mode-metadyn.dat"
-
-# Read first two lines
-line1="$(sed -n '1p' "$vals_file")"
-line2="$(sed -n '2p' "$vals_file")"
-
-# Escape for sed replacement (handles \, &, and delimiter |)
-escape_sed_repl() {
-  printf '%s' "$1" | sed 's/[\/&|\\]/\\&/g'
-}
-
-r1="$(escape_sed_repl "$line1")"
-r2="$(escape_sed_repl "$line2")"
-
-# Replace XXX -> line1 and YYY -> line2
-sed -i -e "s|XXX|$r1|g" -e "s|YYY|$r2|g" "$in_file"
-
 #Copy PLUMED input file with reference structure and FRESEAN modes to standardized file name
 cp ${inpPlumedPDB} plumed-mode-input.pdb
 
