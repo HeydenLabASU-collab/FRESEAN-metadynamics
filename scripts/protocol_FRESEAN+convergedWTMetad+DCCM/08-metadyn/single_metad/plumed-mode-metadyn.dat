@@ -6,7 +6,7 @@ ARG=pca.eig-1,pca.eig-2
 PACE=500
 HEIGHT=1.0
 BIASFACTOR=10
-SIGMA=0.001,0.001
+SIGMA=XXX,YYY
 FILE=plumed-mode-metadyn.hills
 TEMP=300.0
 ... METAD
