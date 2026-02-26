@@ -98,16 +98,16 @@ for i in $(seq $minmode $maxmode); do
     cat evec_${i}_aa_backmapped.xyz
 done > evec_aa_${minmode}-${maxmode}_backmapped.xyz
 
-119 #Start next part of the project if next=1
-120 if [ ${next} -eq 1 ]; then
-121   if [ -f evec_aa_${minmode}-${maxmode}_backmapped.xyz ]; then
-122     if [ -d ${nextDir} ]; then
-123       curDir=`pwd`
-124       cd ${nextDir}
-125       if [ -f run.sh ]; then
-126         sbatch run.sh
-127       fi
-128       cd ${curDir}
-129     fi
-130   fi
-131 fi
+#Start next part of the project if next=1
+if [ ${next} -eq 1 ]; then
+    if [ -f evec_aa_${minmode}-${maxmode}_backmapped.xyz ]; then
+        if [ -d ${nextDir} ]; then
+            curDir=`pwd`
+            cd ${nextDir}
+            if [ -f run.sh ]; then
+                sbatch run.sh
+            fi
+            cd ${curDir}
+        fi
+    fi
+fi
