@@ -1,3 +1,14 @@
 scripts/dccm_test_3/
 scripts/dccm_test_2/
 scripts/dccm_test/
+build/*.o
+src/*.o
+bin/avgBinMatrixList
+bin/convertGMXTOP
+bin/eigen
+bin/extract
+bin/gen-modes_omp
+bin/gen_list
+bin/projDispTrjOnPLUMEDModes
+bin/projDispTrjOnSelFreqModes
+bin/traj_coarse
