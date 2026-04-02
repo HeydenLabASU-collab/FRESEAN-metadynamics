@@ -7,6 +7,7 @@ Please read through each of the following sections to understand how to use this
 
 ## Tested Dependencies
 - FFTW 3.3.10 (https://www.fftw.org/doc/Installation-and-Customization.html)
+- GNU Scientific Library 2.6 (https://www.gnu.org/software/gsl)
 - GNU make 3.8.1 (https://www.gnu.org/software/make/)
 - gcc 14.2 (https://gcc.gnu.org/gcc-14/)
 - python 3.12 (https://www.python.org/downloads/)
