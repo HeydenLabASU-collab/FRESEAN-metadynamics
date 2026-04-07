@@ -31,6 +31,7 @@ exit
 fi
 done
 
+
 #Copy PLUMED input file with reference structure and FRESEAN modes to standardized file name
 cp ${inpPlumedPDB} plumed-mode-input.pdb
 
