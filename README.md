@@ -312,6 +312,9 @@ This input file is utilized by `fresean extract`.
 <summary> References </summary>
 
 # References
-- M. A. Sauer, S. Mondal, B. Neff, S. Maiti, M. Heyden, Fast Sampling of Protein Conformational Dynamics, arXiv:2411.08154 
+- S. Mondal, M. A. Sauer, M. Heyden, From Enhanced Sampling to Human-Readable Representations of Protein Dynamics, DOI:10.48550/arXiv.2605.03394 (2026).
+- M. A. Sauer, S. Mondal, B. Neff, S. Maiti, M. Heyden, Fast Sampling of Protein Conformational Dynamics, Science Advances 12, eaea4617 (2026).
+- B. Neff, M. Heyden, Protein-Water Energy Transfer via Anharmonic Low-Frequency Vibrations, DOI:10.48550/arXiv.2601.02699 (2026).
+- M. A. Sauer, S. Mondal, M. Cano, M. Heyden, High-Throughput Computation of Anharmonic Low-Frequency Protein Vibrations, J. Phys. Chem. B 129, 10739–10751 (2025).
 - S. Mondal, M. A. Sauer, M. Heyden, Exploring Conformational Landscapes Along Anharmonic Low-Frequency Vibrations, J. Phys. Chem. B 128, 7112-7120 (2024).
 - M. A. Sauer, M.Heyden, Frequency-Selective Anharmonic Mode Analysis of Thermally Excited Vibrations in Proteins, J. Chem. Theory Comput. 19, 5481-5490 (2023).
