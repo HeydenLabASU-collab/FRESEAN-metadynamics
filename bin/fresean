@@ -254,7 +254,7 @@ eigen_subcommand(){
 		exit 1
 	fi
 
-	if [ ! -f "$m" || "$m" != *.mmat ]; then
+	if [[ ! -f "$m" || "$m" != *.mmat ]]; then
     	printf " -----------------------------------------------\n   -m flag must be an eigenvector file [.mmat] \n ------------------------------------------------\n"
 		eigen_usage
 		exit 1
@@ -347,7 +347,7 @@ gen_list_subcommand(){
 		printf " -----------------------------------------------\n   -n flag must be a positive integer \n ------------------------------------------------\n"
 		exit 1
 	fi
-	if [[ "$t" -le 0 ]];then
+	if (( $(echo "$t <= 0" | bc -l) )); then
 		printf " -----------------------------------------------\n -t flag must be a positive timestep, in picoseconds \n ------------------------------------------------\n"
 		exit 1
 	fi
