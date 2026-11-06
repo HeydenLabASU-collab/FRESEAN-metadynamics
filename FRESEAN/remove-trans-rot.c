@@ -116,6 +116,79 @@ int readGRO(char *fnGRO,int nAtoms,rvec *crd)
         return 0;
 }
 
+int calcCOM(int nAtoms,real *m,real totMass,rvec *crd,rvec com)
+{
+        int i;
+
+        com[0]=0.0; com[1]=0.0; com[2]=0.0;
+        for(i=0;i<nAtoms;i++) {
+                com[0]+=m[i]*crd[i][0];
+                com[1]+=m[i]*crd[i][1];
+                com[2]+=m[i]*crd[i][2];
+        }
+        com[0]/=totMass;
+        com[1]/=totMass;
+        com[2]/=totMass;
+
+        return 0;
+}
+
+int calcRotAxisAndInertia(int nAtoms,real *m,rvec *crd,rvec axes[3][3])
+{
+        double tensor[9];
+        gsl_matrix *matrix;
+        gsl_matrix *eVec;
+        gsl_vector *eVal;
+        gsl_eigen_symmv_workspace *ws;
+
+        int i,j;
+        /* compute elements of inertia tensor */
+        for(i=0;i<9;i++) {
+                tensor[i]=0.0;
+        }
+        for(i=0;i<nAtoms;i++) {
+                tensor[0]+=m[i]*(crd[i][1]*crd[i][1]+crd[i][2]*crd[i][2]);
+                tensor[4]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][2]*crd[i][2]);
+                tensor[8]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][1]*crd[i][1]);
+                tensor[1]-=m[i]*crd[i][0]*crd[i][1];
+                tensor[2]-=m[i]*crd[i][0]*crd[i][2];
+                tensor[5]-=m[i]*crd[i][1]*crd[i][2];
+        }
+        /* fill symmetric elements */
+        tensor[3]=tensor[1];
+        tensor[6]=tensor[2];
+        tensor[7]=tensor[5];
+
+        /* allocate GSL matrices, vectors and workspace */
+        matrix=(gsl_matrix*)gsl_matrix_alloc(3,3);
+        eVal=(gsl_vector*)gsl_vector_alloc(3);
+        eVec=(gsl_matrix*)gsl_matrix_alloc(3,3);
+        ws=(gsl_eigen_symmv_workspace*)gsl_eigen_symmv_alloc(12);
+        /* fill matrix with inertia tensor elements */
+        for(i=0;i<3;i++) {
+            for(j=0;j<3;j++) {
+                gsl_matrix_set(matrix,i,j,tensor[i*3+j]);
+            }
+        }
+        /* compute eigenvalues and eigenvectors */
+        gsl_eigen_symmv(matrix,eVal,eVec,ws);
+        /* sort eigenvalues and eigenvectors (large to small) */
+        gsl_eigen_symmv_sort(eVal,eVec,GSL_EIGEN_SORT_VAL_DESC);
+
+        /* store eigenvectors as rotation axes */
+        for(i=0;i<3;i++) {
+            for(j=0;j<3;j++) {
+                axes[i][j]=gsl_matrix_get(eVec,i,j);
+            }
+        }
+
+        gsl_matrix_free(matrix);
+        gsl_vector_free(eVal);
+        gsl_matrix_free(eVec);
+        gsl_eigen_symmv_free(ws);
+        return 0;
+}
+
 int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
 {
         int i;
@@ -123,36 +196,20 @@ int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
         char buffer[200];
         float xr,yr,zr;
         real *m;
-        real totMass=0.0;
         rvec **crd;
         rvec com;
-        double inertiaTensor[9];
-        gsl_matrix *matrix;
-        gsl_matrix *eVec;
-        gsl_vector *eVal;
-        gsl_eigen_symmv_workspace *ws;
         rvec axes[3][3];
+        double totMass=0.0;
 
         crd=(rvec*)save_malloc(nAtoms*sizeof(rvec));
         readGRO(fnRef,nAtoms,crd);
 
-        allo
+        allocateReals(&m,nAtoms);
         for(i=0;i<Atoms;i++) {
                 m[i]=atoms[i].mass;
-        }
-
-        com[0]=0.0; com[1]=0.0; com[2]=0.0;
-        for(i=0;i<Atoms;i++) {
-                m[i]=atoms[i].mass;
-                com[0]+=m[i]*10.0*xr;
-                com[1]+=m[i]*10.0*yr;
-                com[2]+=m[i]*10.0*zr;
                 totMass+=m[i];
         }
-        fclose(ref);
-        com[0]/=totMass;
-        com[1]/=totMass;
-        com[2]/=totMass;
+        calcCOM(nAtoms,m,totMass,crd,com);
 
         for(i=0;i<nRef;i++)
         {
@@ -160,37 +217,9 @@ int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
                 crd[i][1]-=com[1];
                 crd[i][2]-=com[2];
         }
+        calcRotAxisAndInertia(nAtoms,m,crd,axes);
 
-        for(i=0;i<9;i++) {
-                inertiaTensor[i]=0.0;
-        }
-        for(i=0;i<nAtoms;i++) {
-                inertiaTensor[0]+=m[i]*(crd[i][1]*crd[i][1]+crd[i][2]*crd[i][2]);
-                inertiaTensor[4]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][2]*crd[i][2]);
-                inertiaTensor[8]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][1]*crd[i][1]);
-                inertiaTensor[1]-=m[i]*crd[i][0]*crd[i][1];
-                inertiaTensor[2]-=m[i]*crd[i][0]*crd[i][2];
-                inertiaTensor[5]-=m[i]*crd[i][1]*crd[i][2];
-        }
-        inertiaTensor[3]=inertiaTensor[1];
-        inertiaTensor[6]=inertiaTensor[2];
-        inertiaTensor[7]=inertiaTensor[5];
-        for(i=0;i<3;i++) {
-            for(j=0;j<3;j++) {
-                gsl_matrix_set(matrix,i,j,inertiaTensor[i*3+j]);
-            }
-        }
-        eVal=(gsl_vector*)gsl_vector_alloc(3);
-        eVec=(gsl_matrix*)gsl_matrix_alloc(3,3);
-        ws=(gsl_eigen_symmv_workspace*)gsl_eigen_symmv_alloc(12);
-        gsl_eigen_symmv(matrix,eVal,eVec,ws);
-        gsl_eigen_symmv_sort(eVal,eVec,GSL_EIGEN_SORT_VAL_DESC);
-
-        for(i=0;i<3;i++) {
-            for(j=0;j<3;j++) {
-                axes[i][j]=gsl_matrix_get(eVec,i,j);
-            }
-        }
+        evTrRot
 
         return 0;
 }
