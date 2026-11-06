@@ -96,18 +96,19 @@ int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
         char buffer[200];
         int nRef;
         float xr,yr,zr;
+        real *masses;
         real totMass=0.0;
 
         ref=fopen(fnRef,"r");
         fgets(buffer,200,ref);
         fgets(buffer,200,ref);
         sscanf(buffer,"%d",&nRef);
-        if(nRef!=grp.nAtoms) {
-                sprintf(buffer,"nAtoms in %s (%d) and group %s (%d) don't match!\n",fnRef,nRef,grp.name,grp.nAtoms);
+        if(nRef!=nAtoms) {
+                sprintf(buffer,"nAtoms in %s (%d) and matrix (%d) don't match!\n",fnRef,nRef,nAtoms);
                 fatal(buffer);
         }
-        allocReals(w_rls,grp.nAtoms);
-        refCrd[0]=(rvec*)save_malloc(grp.nAtoms*sizeof(rvec));
+        allocReals(masses,nAtoms);
+        refCrd[0]=(rvec*)save_malloc(nAtoms*sizeof(rvec));
         refCOM[0].x=0.0; refCOM[0].y=0.0; refCOM[0].z=0.0;
         for(i=0;i<nRef;i++) {
                 fgets(buffer,200,ref);
