@@ -89,51 +89,108 @@ int getInput(char *fnCOM,char *fnTop,
         return 0;
 }
 
+int readGRO(char *fnGRO,int nAtoms,rvec *crd)
+{
+        FILE *gro;
+        char buffer[200];
+        int i;
+        float xr,yr,zr;
+        int nAtomsGRO;
+
+        gro=fopen(fnGRO,"r");
+        fgets(buffer,200,gro);
+        fgets(buffer,200,gro);
+        sscanf(buffer,"%d",&nAtomsGRO);
+        if(nAtomsGRO!=nAtoms) {
+                sprintf(buffer,"nAtoms in %s (%d) and matrix (%d) don't match!\n",fnGRO,nAtomsGRO,nAtoms);
+                fatal(buffer);
+        }
+        for(i=0;i<*nAtoms;i++) {
+                fgets(buffer,200,gro);
+                sscanf(&buffer[20],"%f %f %f",&xr,&yr,&zr);
+                crd[i][0]=10.0*xr;
+                crd[i][1]=10.0*yr;
+                crd[i][2]=10.0*zr;
+        }
+        fclose(gro);
+        return 0;
+}
+
 int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
 {
         int i;
         FILE *ref;
         char buffer[200];
-        int nRef;
         float xr,yr,zr;
-        real *masses;
+        real *m;
         real totMass=0.0;
+        rvec **crd;
+        rvec com;
+        double inertiaTensor[9];
+        gsl_matrix *matrix;
+        gsl_matrix *eVec;
+        gsl_vector *eVal;
+        gsl_eigen_symmv_workspace *ws;
+        rvec axes[3][3];
 
-        ref=fopen(fnRef,"r");
-        fgets(buffer,200,ref);
-        fgets(buffer,200,ref);
-        sscanf(buffer,"%d",&nRef);
-        if(nRef!=nAtoms) {
-                sprintf(buffer,"nAtoms in %s (%d) and matrix (%d) don't match!\n",fnRef,nRef,nAtoms);
-                fatal(buffer);
+        crd=(rvec*)save_malloc(nAtoms*sizeof(rvec));
+        readGRO(fnRef,nAtoms,crd);
+
+        allo
+        for(i=0;i<Atoms;i++) {
+                m[i]=atoms[i].mass;
         }
-        allocReals(masses,nAtoms);
-        refCrd[0]=(rvec*)save_malloc(nAtoms*sizeof(rvec));
-        refCOM[0].x=0.0; refCOM[0].y=0.0; refCOM[0].z=0.0;
-        for(i=0;i<nRef;i++) {
-                fgets(buffer,200,ref);
-                sscanf(&buffer[20],"%f %f %f",&xr,&yr,&zr);
-                w_rls[0][i]=atoms[grp.atoms[i]].mass;
-                refCrd[0][i][0]=10.0*xr;
-                refCrd[0][i][1]=10.0*yr;
-                refCrd[0][i][2]=10.0*zr;
-                refCOM[0].x+=w_rls[0][i]*10.0*xr;
-                refCOM[0].y+=w_rls[0][i]*10.0*yr;
-                refCOM[0].z+=w_rls[0][i]*10.0*zr;
-                totMass+=w_rls[0][i];
+
+        com[0]=0.0; com[1]=0.0; com[2]=0.0;
+        for(i=0;i<Atoms;i++) {
+                m[i]=atoms[i].mass;
+                com[0]+=m[i]*10.0*xr;
+                com[1]+=m[i]*10.0*yr;
+                com[2]+=m[i]*10.0*zr;
+                totMass+=m[i];
         }
         fclose(ref);
-        refCOM[0].x/=totMass;
-        refCOM[0].y/=totMass;
-        refCOM[0].z/=totMass;
+        com[0]/=totMass;
+        com[1]/=totMass;
+        com[2]/=totMass;
 
         for(i=0;i<nRef;i++)
         {
-                refCrd[0][i][0]-=refCOM[0].x;
-                refCrd[0][i][1]-=refCOM[0].y;
-                refCrd[0][i][2]-=refCOM[0].z;
+                crd[i][0]-=com[0];
+                crd[i][1]-=com[1];
+                crd[i][2]-=com[2];
         }
-        x[0]=(rvec*)save_malloc(nRef*sizeof(rvec));
+
+        for(i=0;i<9;i++) {
+                inertiaTensor[i]=0.0;
+        }
+        for(i=0;i<nAtoms;i++) {
+                inertiaTensor[0]+=m[i]*(crd[i][1]*crd[i][1]+crd[i][2]*crd[i][2]);
+                inertiaTensor[4]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][2]*crd[i][2]);
+                inertiaTensor[8]+=m[i]*(crd[i][0]*crd[i][0]+crd[i][1]*crd[i][1]);
+                inertiaTensor[1]-=m[i]*crd[i][0]*crd[i][1];
+                inertiaTensor[2]-=m[i]*crd[i][0]*crd[i][2];
+                inertiaTensor[5]-=m[i]*crd[i][1]*crd[i][2];
+        }
+        inertiaTensor[3]=inertiaTensor[1];
+        inertiaTensor[6]=inertiaTensor[2];
+        inertiaTensor[7]=inertiaTensor[5];
+        for(i=0;i<3;i++) {
+            for(j=0;j<3;j++) {
+                gsl_matrix_set(matrix,i,j,inertiaTensor[i*3+j]);
+            }
+        }
+        eVal=(gsl_vector*)gsl_vector_alloc(3);
+        eVec=(gsl_matrix*)gsl_matrix_alloc(3,3);
+        ws=(gsl_eigen_symmv_workspace*)gsl_eigen_symmv_alloc(12);
+        gsl_eigen_symmv(matrix,eVal,eVec,ws);
+        gsl_eigen_symmv_sort(eVal,eVec,GSL_EIGEN_SORT_VAL_DESC);
+
+        for(i=0;i<3;i++) {
+            for(j=0;j<3;j++) {
+                axes[i][j]=gsl_matrix_get(eVec,i,j);
+            }
+        }
 
         return 0;
 }
