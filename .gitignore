@@ -11,4 +11,5 @@ bin/gen-modes_omp
 bin/gen_list
 bin/projDispTrjOnPLUMEDModes
 bin/projDispTrjOnSelFreqModes
+bin/remove-trans-rot
 bin/traj_coarse

@@ -10,12 +10,7 @@
 #include "../include/alloc.h"
 #include "../include/top.h"
 #include "../include/io.h"
-#include "../include/mol.h"
 #include "../include/fatal.h"
-#include "../include/job.h"
-#include "../include/select.h"
-#include "../include/geo.h"
-#include "../include/mol.h"
 #include "../include/align.h"
 #include "../include/progress.h"
 
@@ -89,7 +84,7 @@ int getInput(char *fnCOM,char *fnTop,
         return 0;
 }
 
-int readGRO(char *fnGRO,int nAtoms,rvec *crd)
+int readGROref(char *fnGRO,int nAtoms,rvec *crd)
 {
         FILE *gro;
         char buffer[200];
@@ -207,13 +202,13 @@ int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
         real *sqm;
         rvec *crd;
         rvec com;
-        rvec axes[3][3];
+        rvec axes[3];
         double totMass=0.0;
         rvec tmp;
         double norm;
 
         crd=(rvec*)save_malloc(nAtoms*sizeof(rvec));
-        readGRO(fnRef,nAtoms,crd);
+        readGROref(fnRef,nAtoms,crd);
 
         allocReals(&m,nAtoms);
         allocReals(&sqm,nAtoms);
@@ -412,6 +407,8 @@ int main(int argc, char *argv[])
         }
 
         /* reading correlation matrices from file */
+        printf(" Reading and filtering correlation matrices from file %s\n",fnMatrix);
+        printf(" Writing filtered correlation matrices to file %s\n",fnOut);
         for(i=0;i<nCorr;i++) {
                 fread(&bc1,sizeof(int),1,in);
                 for(j=0;j<n1;j++) {
@@ -454,6 +451,7 @@ int main(int argc, char *argv[])
                         }
                         fprintf(out,"\n%d\n",magic2);
                 }
+                progressBar(i,1,nCorr);
         }
         fclose(in);
         fclose(out);

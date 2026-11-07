@@ -5,7 +5,7 @@ SRCDIR=src
 SRCS=$(wildcard $(SRCDIR)/*.c)
 OBJS=$(patsubst $(SRCDIR)/%.c, $(SRCDIR)/%.o, $(SRCS))
 
-all: ${OBJS} avgBinMatrixList convertGMXTOP gen_list gen-modes_omp eigen extract traj_coarse projDispTrjOnSelFreqModes projDispTrjOnPLUMEDModes
+all: ${OBJS} avgBinMatrixList convertGMXTOP gen_list gen-modes_omp remove-trans-rot eigen extract traj_coarse projDispTrjOnSelFreqModes projDispTrjOnPLUMEDModes
 
 ${SRCDIR}/%.o: ${SRCDIR}/%.c
 	${GCC} ${CFLAGS} -c -o $@ $<
@@ -47,6 +47,12 @@ gen-modes_omp: build/gen-modes_omp.o
 
 build/gen-modes_omp.o: ${CODE}/gen-modes_omp.c
 	${GCC} -c ${CODE}/gen-modes_omp.c -o build/gen-modes_omp.o -fopenmp -lfftw3
+
+remove-trans-rot: build/remove-trans-rot.o
+	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/top.o ${SRCDIR}/alloc.o ${SRCDIR}/mol.o ${SRCDIR}/job.o ${SRCDIR}/select.o ${SRCDIR}/qsort.o ${SRCDIR}/align.o ${SRCDIR}/grps.o ${SRCDIR}/progress.o build/remove-trans-rot.o -lgsl -lgslcblas -lm -o bin/remove-trans-rot
+
+build/remove-trans-rot.o: ${CODE}/remove-trans-rot.c
+	${GCC} -c ${CODE}/remove-trans-rot.c -o build/remove-trans-rot.o
 
 eigen: build/eigen.o
 	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/top.o ${SRCDIR}/alloc.o ${SRCDIR}/mol.o ${SRCDIR}/job.o ${SRCDIR}/select.o ${SRCDIR}/qsort.o ${SRCDIR}/align.o ${SRCDIR}/grps.o build/eigen.o -lgsl -lgslcblas -fopenmp -lm -o bin/eigen
