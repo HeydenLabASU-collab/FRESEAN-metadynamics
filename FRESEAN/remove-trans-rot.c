@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_eigen.h>
 #include <omp.h>
 #include "../include/dataTypes.h"
 #include "../include/alloc.h"
@@ -44,14 +48,14 @@ int getLineFromCOM(FILE *in,char *buffer,int max)
 int printKeys() {
         printf("fnTop (topology file [.mtop])\n");
         printf("fnRef (reference coordinate file)\nfnMatrix (cross-correlation matrix file)\n");
-        printf("nCorr (number of points in time correlation function)\nbinaryMatrix (0 for human readable, 1 for binary matrix)\n");
+        printf("binaryMatrix output (0 for human readable, 1 for binary matrix)\n");
         printf("fnOut (output matrix file)\n");
         return 0;
 }
 
 int getInput(char *fnCOM,char *fnTop,
                 char *fnRef,char *fnMatrix,
-                int *nCorr,int *binaryMatrix,
+                int *binaryMatrix,
                 char *fnOut) {
         FILE *io;
         char buffer[300];
@@ -72,10 +76,6 @@ int getInput(char *fnCOM,char *fnTop,
         getLineFromCOM(io,buffer,300);
         sscanf(buffer,"%s",fnMatrix);
         printf("%2d -> read %20s : %s\n",i,"fnMatrix",fnMatrix);i++;
-
-        getLineFromCOM(io,buffer,300);
-        sscanf(buffer,"%d",nCorr);
-        printf("%2d -> read %20s : %d\n",i,"nCorr",nCorr[0]);i++;
 
         getLineFromCOM(io,buffer,300);
         sscanf(buffer,"%d",binaryMatrix);
@@ -105,7 +105,7 @@ int readGRO(char *fnGRO,int nAtoms,rvec *crd)
                 sprintf(buffer,"nAtoms in %s (%d) and matrix (%d) don't match!\n",fnGRO,nAtomsGRO,nAtoms);
                 fatal(buffer);
         }
-        for(i=0;i<*nAtoms;i++) {
+        for(i=0;i<nAtoms;i++) {
                 fgets(buffer,200,gro);
                 sscanf(&buffer[20],"%f %f %f",&xr,&yr,&zr);
                 crd[i][0]=10.0*xr;
@@ -133,7 +133,7 @@ int calcCOM(int nAtoms,real *m,real totMass,rvec *crd,rvec com)
         return 0;
 }
 
-int calcRotAxisAndInertia(int nAtoms,real *m,rvec *crd,rvec axes[3][3])
+int calcRotAxisAndInertia(int nAtoms,real *m,rvec *crd,rvec *axes)
 {
         double tensor[9];
         gsl_matrix *matrix;
@@ -189,29 +189,42 @@ int calcRotAxisAndInertia(int nAtoms,real *m,rvec *crd,rvec axes[3][3])
         return 0;
 }
 
+int cross(rvec a,rvec b,rvec c)
+{
+        c[0]=a[1]*b[2]-a[2]*b[1];
+        c[1]=a[2]*b[0]-a[0]*b[2];
+        c[2]=a[0]*b[1]-a[1]*b[0];
+        return 0;
+}
+
 int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
 {
-        int i;
+        int i,j;
         FILE *ref;
         char buffer[200];
         float xr,yr,zr;
         real *m;
-        rvec **crd;
+        real *sqm;
+        rvec *crd;
         rvec com;
         rvec axes[3][3];
         double totMass=0.0;
+        rvec tmp;
+        double norm;
 
         crd=(rvec*)save_malloc(nAtoms*sizeof(rvec));
         readGRO(fnRef,nAtoms,crd);
 
-        allocateReals(&m,nAtoms);
-        for(i=0;i<Atoms;i++) {
+        allocReals(&m,nAtoms);
+        allocReals(&sqm,nAtoms);
+        for(i=0;i<nAtoms;i++) {
                 m[i]=atoms[i].mass;
+                sqm[i]=sqrt(m[i]);
                 totMass+=m[i];
         }
         calcCOM(nAtoms,m,totMass,crd,com);
 
-        for(i=0;i<nRef;i++)
+        for(i=0;i<nAtoms;i++)
         {
                 crd[i][0]-=com[0];
                 crd[i][1]-=com[1];
@@ -219,8 +232,47 @@ int getRefTransRot(char *fnRef,int nAtoms,t_atom *atoms,double **evTrRot)
         }
         calcRotAxisAndInertia(nAtoms,m,crd,axes);
 
-        evTrRot
-
+        /* generate idealized translation and rotation modes */
+        for(i=0;i<nAtoms;i++) {
+                /* rigid body translation in x */
+                evTrRot[0][3*i+0]=sqm[i]*1.0;
+                evTrRot[0][3*i+1]=sqm[i]*0.0;
+                evTrRot[0][3*i+2]=sqm[i]*0.0;
+                /* rigid body translation in y */
+                evTrRot[1][3*i+0]=sqm[i]*0.0;
+                evTrRot[1][3*i+1]=sqm[i]*1.0;
+                evTrRot[1][3*i+2]=sqm[i]*0.0;
+                /* rigid body translation in z */
+                evTrRot[2][3*i+0]=sqm[i]*0.0;
+                evTrRot[2][3*i+1]=sqm[i]*0.0;
+                evTrRot[2][3*i+2]=sqm[i]*1.0;
+                /* rigid body rotation around inertia axis 1 */
+                cross(axes[0],crd[i],tmp);
+                evTrRot[3][3*i+0]=sqm[i]*tmp[0];
+                evTrRot[3][3*i+1]=sqm[i]*tmp[1];
+                evTrRot[3][3*i+2]=sqm[i]*tmp[2];
+                /* rigid body rotation around inertia axis 2 */
+                cross(axes[1],crd[i],tmp);
+                evTrRot[4][3*i+0]=sqm[i]*tmp[0];
+                evTrRot[4][3*i+1]=sqm[i]*tmp[1];
+                evTrRot[4][3*i+2]=sqm[i]*tmp[2];
+                /* rigid body rotation around inertia axis 3 */
+                cross(axes[2],crd[i],tmp);
+                evTrRot[5][3*i+0]=sqm[i]*tmp[0];
+                evTrRot[5][3*i+1]=sqm[i]*tmp[1];
+                evTrRot[5][3*i+2]=sqm[i]*tmp[2];
+        }
+        /* normalize idealized modes */
+        for(i=0;i<6;i++) {
+                norm=0;
+                for(j=0;j<3*nAtoms;j++) {
+                        norm+=evTrRot[i][j]*evTrRot[i][j];
+                }
+                norm=sqrt(norm);
+                for(j=0;j<3*nAtoms;j++) {
+                        evTrRot[i][j]/=norm;
+                }
+        }
         return 0;
 }
 
@@ -229,11 +281,10 @@ typedef struct {
         int nu,nv;
 } t_mat;
 
-int getMat(t_mat mat,int u,int v,double *muv) {
+double getMat(t_mat mat,int u,int v) {
         int i;
         i=u*mat.nv+v;
-        muv[0]=mat.m[i];
-        return 0;
+        return mat.m[i];
 }
 
 int setMat(t_mat mat,int u,int v,double muv) {
@@ -245,9 +296,8 @@ int setMat(t_mat mat,int u,int v,double muv) {
 
 int main(int argc, char *argv[])
 {
-        FILE *vin,*out;
+        FILE *in,*out;;
         char fnCOM[100],fnTop[100],fnMatrix[100],fnOut[100];
-        char fnOut2[100];
         t_atom *atoms;
         t_vecR *siteCrds;
         t_mol *mols;
@@ -257,23 +307,24 @@ int main(int argc, char *argv[])
         real time=0.0;
         t_box box;
         int wc=0;
-        int i=0;
-        int j=0;
-        int k,l,m;
+        int i,j,k;
         rvec *x;
         real *w_rls;
         rvec *refCrd;
         t_vecR refCOM;
         int bufferpos;
 /*MODULAR*/
-        double *sqm;
+        double **evTrRot;
         char fnRef[100];
         int nDOF;
         int nCorr;
+        int n1,n2;
+        int bc1,bc2;
         int binaryMatrix=0;
-        t_mat mat;
+        t_mat mat,matFilter;
         int magic1,magic2;
         double **rcu,**rcv;
+        double tmp;
 /*MODULAR*/
 
         printTitle();
@@ -287,7 +338,7 @@ int main(int argc, char *argv[])
         strcpy(fnCOM,argv[1]);
         getInput(fnCOM,fnTop,
                 fnRef,fnMatrix,
-                &nCorr,&binaryMatrix,
+                &binaryMatrix,
                 fnOut);
 /*PARTIALLY MODULAR*/
 
@@ -296,70 +347,117 @@ int main(int argc, char *argv[])
         /*mols[nMols] is used to store bonds, angles, dihedrals and impropers between residues*/
 
 /*MODULAR*/
+        /* generate idealized translation and rotation modes */
         nDOF=3*nAtoms;
-        sqm=(double*)save_malloc(nDOF*sizeof(double));
-        k=0;
-        for(i=0;i<nAtoms;i++) {
-                sqm[k  ]=sqrt(atoms[i].mass);
-                sqm[k+1]=sqrt(atoms[i].mass);
-                sqm[k+2]=sqrt(atoms[i].mass);
-                k+=3;
+        evTrRot=(double**)save_malloc(6*sizeof(double*));
+        for(i=0;i<6;i++) {
+                evTrRot[i]=(double*)save_malloc(nDOF*sizeof(double));
         }
+        getRefTransRot(fnRef,nAtoms,atoms,evTrRot);
  
+        /* allocate a single matrix */
         mat.m=(double*)save_malloc(nDOF*nDOF*sizeof(double));
         mat.nu=nDOF;
         mat.nv=nDOF;
-/*MODULAR*/
-
-        l=0;
-        printf(" - reading input trajectory\n");fflush(stdout);
-        /*HAPPY COMPUTING!!!*/
-        for(i=0;i<nCorr;i++)
-        {
-                
-                printf("step %d of %d%c",i+1,nCorr,(char)13); fflush(stdout);
+        /* allocate filter matrix */
+        matFilter.m=(double*)save_malloc(nDOF*nDOF*sizeof(double));
+        matFilter.nu=nDOF;
+        matFilter.nv=nDOF;
+        /* fill filter matrix */
+        for(i=0;i<nDOF*nDOF;i++) {
+                matFilter.m[i]=0.0;
         }
-        printf("\n");
+        for(i=0;i<nDOF;i++) {
+                setMat(matFilter,i,i,1.0);
+        }
+        for(i=0;i<6;i++) {
+                for(j=0;j<nDOF;j++) {
+                        for(k=0;k<nDOF;k++) {
+                                setMat(matFilter,j,k,
+                                        getMat(matFilter,j,k)-evTrRot[i][j]*evTrRot[i][k]
+                                );
+                        }
+                }
+        }
 
-        printf(" - writing frequency-dependent velocity cross correlation matrix to output file\n");fflush(stdout);
+        /* prepare reading binary input matrix */
+        in=fopen(fnMatrix,"rb");
+        fread(&bc1,sizeof(int),1,in);
+        fread(&nCorr,sizeof(int),1,in);
+        fread(&n1,sizeof(int),1,in);
+        fread(&n2,sizeof(int),1,in);
+        fread(&bc2,sizeof(int),1,in);
+        if(bc2!=bc1) {
+                printf("format error in file: %s\n",fnMatrix);
+                exit(1);
+        }
+        if(n1!=n2) {
+                printf("matrices in file %s are not square: %d x %d\n",fnMatrix,n1,n2);
+                exit(1);
+        }
+
+        /* prepare writing output matrix */
+        magic1=3*sizeof(int);
+        magic2=nDOF*nDOF*sizeof(double);
         if(binaryMatrix!=0) {
-                printf(" - writing cross correlation matrix in binary format\n");
-                magic1=3*sizeof(int);
-                magic2=nDOF*nDOF*sizeof(double);
-                sprintf(fnOut2,"matrix_%s.mmat",fnOut);
-                out=fopen(fnOut2,"wb");
-                printf("   -> opening file: %s\n",fnOut2);fflush(stdout);
+                out=fopen(fnOut,"wb");
                 fwrite(&magic1,sizeof(int),1,out);
                 fwrite(&nCorr,sizeof(int),1,out);
                 fwrite(&nDOF,sizeof(int),1,out);
                 fwrite(&nDOF,sizeof(int),1,out);
                 fwrite(&magic1,sizeof(int),1,out);
-                for(i=0;i<nCorr;i++) {
+        } else {
+                out=fopen(fnOut,"w");
+                fprintf(out,"%d\n%d %d %d\n%d\n",magic1,nCorr,nDOF,nDOF,magic1);
+        }
+
+        /* reading correlation matrices from file */
+        for(i=0;i<nCorr;i++) {
+                fread(&bc1,sizeof(int),1,in);
+                for(j=0;j<n1;j++) {
+                        for(k=0;k<n2;k++) {
+                                fread(&tmp,sizeof(double),1,in);
+                                setMat(mat,j,k,tmp);
+                        }
+                }
+                fread(&bc2,sizeof(int),1,in);
+                if(bc2!=bc1) {
+                        printf("format error in file: %s\n",fnMatrix);
+                        exit(1);
+                }
+                /* filter out translational and rotational components */
+                for(j=0;j<nDOF;j++) {
+                        for(k=0;k<nDOF;k++) {
+                                setMat(mat,j,k,
+                                        getMat(mat,j,k)*getMat(matFilter,k,j)
+                                );
+                        }
+                }
+                for(j=0;j<nDOF;j++) {
+                        for(k=0;k<nDOF;k++) {
+                                setMat(mat,j,k,
+                                        getMat(matFilter,j,k)*getMat(mat,k,j)
+                                );
+                        }
+                }
+                /* write filtered matrix to output file */
+                if(binaryMatrix!=0) {
                         fwrite(&magic2,sizeof(int),1,out);
                         for(j=0;j<nDOF*nDOF;j++) {
-                                fwrite(&mat[i].m[j],sizeof(double),1,out);
+                                fwrite(&mat.m[j],sizeof(double),1,out);
                         }
                         fwrite(&magic2,sizeof(int),1,out);
-                }
-                fclose(out);
-        } else {
-                printf(" - writing cross correlation matrix in ASCII format\n");
-                magic1=3*sizeof(int);
-                magic2=nDOF*nDOF*sizeof(double);
-                sprintf(fnOut2,"matrix_%s.mmat",fnOut);
-                out=fopen(fnOut2,"w");
-                fprintf(out,"%d\n%d %d %d\n%d\n",magic1,nCorr,nDOF,nDOF,magic1);
-                for(i=0;i<nCorr;i++) {
+                } else {
                         fprintf(out,"%d\n",magic2);
                         for(j=0;j<nDOF*nDOF;j++) {
-                                fprintf(out," %e",mat[i].m[j]);
+                                fprintf(out," %e",mat.m[j]);
                         }
                         fprintf(out,"\n%d\n",magic2);
                 }
-                fclose(out);
         }
-        printf("   -> closing file: %s\n",fnOut2);fflush(stdout);
-        printf(" - completed writing frequency-dependent velocity cross correlation matrix to file\n");fflush(stdout);
+        fclose(in);
+        fclose(out);
+/*MODULAR*/
 
         return 0;
 }
