@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
         real time=0.0;
         t_box box;
         int wc=0;
-        int i,j,k;
+        int i,j,k,l;
         rvec *x;
         real *w_rls;
         rvec *refCrd;
@@ -316,10 +316,11 @@ int main(int argc, char *argv[])
         int n1,n2;
         int bc1,bc2;
         int binaryMatrix=0;
-        t_mat mat,matFilter;
+        t_mat mat,matFilter,res;
         int magic1,magic2;
         double **rcu,**rcv;
         double tmp;
+        double a,b,c,p;
 /*MODULAR*/
 
         printTitle();
@@ -354,6 +355,10 @@ int main(int argc, char *argv[])
         mat.m=(double*)save_malloc(nDOF*nDOF*sizeof(double));
         mat.nu=nDOF;
         mat.nv=nDOF;
+        /* allocate a single matrix */
+        res.m=(double*)save_malloc(nDOF*nDOF*sizeof(double));
+        res.nu=nDOF;
+        res.nv=nDOF;
         /* allocate filter matrix */
         matFilter.m=(double*)save_malloc(nDOF*nDOF*sizeof(double));
         matFilter.nu=nDOF;
@@ -425,29 +430,40 @@ int main(int argc, char *argv[])
                 /* filter out translational and rotational components */
                 for(j=0;j<nDOF;j++) {
                         for(k=0;k<nDOF;k++) {
-                                setMat(mat,j,k,
-                                        getMat(mat,j,k)*getMat(matFilter,k,j)
-                                );
+                                p=0.0;
+                                for(l=0;l<nDOF;l++) {
+                                        a=getMat(mat,j,l);
+                                        b=getMat(matFilter,l,k);
+                                        p+=a*b;
+                                }
+                                setMat(res,j,k,p);
                         }
+                }
+                for(j=0;j<nDOF*nDOF;j++) {
+                        mat.m[j]=res.m[j];
                 }
                 for(j=0;j<nDOF;j++) {
                         for(k=0;k<nDOF;k++) {
-                                setMat(mat,j,k,
-                                        getMat(matFilter,j,k)*getMat(mat,k,j)
-                                );
+                                p=0.0;
+                                for(l=0;l<nDOF;l++) {
+                                        a=getMat(matFilter,j,l);
+                                        b=getMat(mat,l,k);
+                                        p+=a*b;
+                                }
+                                setMat(res,j,k,p);
                         }
                 }
                 /* write filtered matrix to output file */
                 if(binaryMatrix!=0) {
                         fwrite(&magic2,sizeof(int),1,out);
                         for(j=0;j<nDOF*nDOF;j++) {
-                                fwrite(&mat.m[j],sizeof(double),1,out);
+                                fwrite(&res.m[j],sizeof(double),1,out);
                         }
                         fwrite(&magic2,sizeof(int),1,out);
                 } else {
                         fprintf(out,"%d\n",magic2);
                         for(j=0;j<nDOF*nDOF;j++) {
-                                fprintf(out," %e",mat.m[j]);
+                                fprintf(out," %e",res.m[j]);
                         }
                         fprintf(out,"\n%d\n",magic2);
                 }
