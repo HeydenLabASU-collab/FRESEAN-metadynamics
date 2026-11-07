@@ -5,7 +5,7 @@ SRCDIR=src
 SRCS=$(wildcard $(SRCDIR)/*.c)
 OBJS=$(patsubst $(SRCDIR)/%.c, $(SRCDIR)/%.o, $(SRCS))
 
-all: ${OBJS} avgBinMatrixList convertGMXTOP gen_list gen-modes_omp remove-trans-rot eigen extract traj_coarse projDispTrjOnSelFreqModes projDispTrjOnPLUMEDModes
+all: ${OBJS} avgBinMatrixList convertGMXTOP gen_list gen-modes_omp remove-trans-rot eigen qtCq extract traj_coarse projDispTrjOnSelFreqModes projDispTrjOnPLUMEDModes
 
 ${SRCDIR}/%.o: ${SRCDIR}/%.c
 	${GCC} ${CFLAGS} -c -o $@ $<
@@ -59,6 +59,12 @@ eigen: build/eigen.o
 
 build/eigen.o: ${CODE}/eigen.c
 	${GCC} -c ${CODE}/eigen.c -o build/eigen.o -fopenmp
+
+qtCq: build/qtCq.o
+	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/top.o ${SRCDIR}/alloc.o ${SRCDIR}/mol.o ${SRCDIR}/job.o ${SRCDIR}/select.o ${SRCDIR}/qsort.o ${SRCDIR}/align.o ${SRCDIR}/grps.o build/qtCq.o -lgsl -lgslcblas -fopenmp -lm -o bin/qtCq
+
+build/qtCq.o: ${CODE}/qtCq.c
+	${GCC} -c ${CODE}/qtCq.c -o build/qtCq.o -fopenmp
 
 extract: build/extractEigVec.o
 	${GCC} ${SRCDIR}/fatal.o ${SRCDIR}/GMXtrrio.o ${SRCDIR}/io.o ${SRCDIR}/geo.o ${SRCDIR}/alloc.o build/extractEigVec.o -lm -o bin/extract
