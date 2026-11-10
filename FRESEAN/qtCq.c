@@ -9,10 +9,12 @@
 
 int printTitle() {
     printf("THE PURPOSE OF THIS PROGRAM IS TO COMPUTE THE\n");
-    printf("PRODUCT Q^T.C(x).Q AS A FUNCTION OF x, WHERE Q\n");
-    printf("IS A MATRIX OF ORTHONORMAL VECTORS (AS COLUMNS),\n");
-    printf("Q^T IS ITS TRANSPOSED FORM AND C(x) IS A SET OF\n");
-    printf("SQUARE MATRICES THAT VARY WITH x.\n");
+    printf("1D-VDOS FOR A SET OF VIBRATIONAL MODES (NORMALIZED\n");
+    printf("COLLECTIVE DISPLACEMENT MODES) VIA THEPRODUCT:\n");
+    printf("Q^T.C(NU).Q, WHERE Q IS A MATRIX OF MODE VECTORS\n");
+    printf("(AS COLUMNS), Q^T IS ITS TRANSPOSED FORM AND C(NU)\n");
+    printf("IS A SET OF MASS_WEIGHTED VELOCITY CROSS-CORRELATION\n"):
+    printf("MATRICES WITH VARYING FREQUENCY NU.\n");
     printf("Version 1.0: Aug. 20, 2025\n");
     printf("Author:\n");
     printf(" Dr. Matthias Heyden\n");
