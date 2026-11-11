@@ -10,11 +10,11 @@
 int printTitle() {
     printf("THE PURPOSE OF THIS PROGRAM IS TO COMPUTE THE\n");
     printf("1D-VDOS FOR A SET OF VIBRATIONAL MODES (NORMALIZED\n");
-    printf("COLLECTIVE DISPLACEMENT MODES) VIA THEPRODUCT:\n");
+    printf("COLLECTIVE DISPLACEMENT MODES) VIA THE PRODUCT:\n");
     printf("Q^T.C(NU).Q, WHERE Q IS A MATRIX OF MODE VECTORS\n");
-    printf("(AS COLUMNS), Q^T IS ITS TRANSPOSED FORM AND C(NU)\n");
-    printf("IS A SET OF MASS_WEIGHTED VELOCITY CROSS-CORRELATION\n"):
-    printf("MATRICES WITH VARYING FREQUENCY NU.\n");
+    printf("(AS COLUMNS), Q^T IS ITS TRANSPOSED FORM (INPUT)\n");
+    printf("AND C(NU) IS A SET OF FRQUENCY-(NU)-DEPENDENT\n");
+    printf("MASS-WEIGHTED VELOCITY CROSS-CORRELATION MATRICES.\n");
     printf("Version 1.0: Aug. 20, 2025\n");
     printf("Author:\n");
     printf(" Dr. Matthias Heyden\n");
@@ -39,12 +39,12 @@ int getLineFromCOM(FILE *in,char *buffer,int max)
 int printKeys() {
     printf("fnC (*.mmat-format)\n");
     printf("fnQ^T (*.mmat-format)\n");
-    printf("selQset\nfirst\nlast\nx0\ndx\nfnOut\n");
+    printf("freqSel\nfirst\nlast\nnCorr\ndt\nfnOut\n");
     return 0;
 }
 
-int getInput(char *fnCOM,char *fnCx,char *fnQt,int *selQset,
-                int *first,int *last,double *x0,double *dx,
+int getInput(char *fnCOM,char *fnCx,char *fnQt,int *freqSel,
+                int *first,int *last,int *nCorr,double *dt,
                 char *fnOut) {
     FILE *io;
     char buffer[300];
@@ -63,8 +63,8 @@ int getInput(char *fnCOM,char *fnCx,char *fnQt,int *selQset,
     printf("%2d -> read %20s : %s\n",i,"fnQt",fnQt);i++;
     
     getLineFromCOM(io,buffer,300);
-    sscanf(buffer,"%d",selQset);
-    printf("%2d -> read %20s : %d\n",i,"selQset",selQset[0]);i++;
+    sscanf(buffer,"%d",freqSel);
+    printf("%2d -> read %20s : %d\n",i,"freqSel",freqSel[0]);i++;
 
     getLineFromCOM(io,buffer,300);
     sscanf(buffer,"%d",first);
@@ -75,15 +75,14 @@ int getInput(char *fnCOM,char *fnCx,char *fnQt,int *selQset,
     printf("%2d -> read %20s : %d\n",i,"last",last[0]);i++;
 
     getLineFromCOM(io,buffer,300);
-    sscanf(buffer,"%f",&tmp);
-    x0[0]=tmp;
-    printf("%2d -> read %20s : %f\n",i,"x0",tmp);i++;
+    sscanf(buffer,"%d",nCorr);
+    printf("%2d -> read %20s : %d\n",i,"nCorr",nCorr[0]);i++;
 
     getLineFromCOM(io,buffer,300);
     sscanf(buffer,"%f",&tmp);
-    dx[0]=tmp;
-    printf("%2d -> read %20s : %f\n",i,"dx",tmp);i++;
-
+    dt[0]=tmp;
+    printf("%2d -> read %20s : %f\n",i,"dt",tmp);i++;
+                    
     getLineFromCOM(io,buffer,300);
     sscanf(buffer,"%s",fnOut);
     printf("%2d -> read %20s : %s\n",i,"fnOut",fnOut);i++;
@@ -116,8 +115,9 @@ int main(int argc, char *argv[])
     FILE  *inCx,*inQt,*out;
     char fnCOM[300],fnCx[300],fnQt[300],fnOut[300],fnOut2[300];;
     int i,j,k,l;
-    int selQset,first,last;
-    double x0,dx;
+    int freqSel,first,last;
+    int nCorr;
+    double dt,df;
     int nx;
     t_mat Qt;
     t_mat Cx;
@@ -136,7 +136,9 @@ int main(int argc, char *argv[])
         fatal("no input file specified\n");
     }
     strcpy(fnCOM,argv[1]);
-    getInput(fnCOM,fnCx,fnQt,&selQset,&first,&last,&x0,&dx,fnOut);
+    getInput(fnCOM,fnCx,fnQt,&freqSel,&first,&last,&nCorr,&dt,fnOut);
+
+    df=33.3564/((2*nCorr-1)*dt);
 
     n=last-first+1;
     if(n<1) fatal("first must be smaller than last\n");
@@ -147,8 +149,8 @@ int main(int argc, char *argv[])
     fread(&n1,sizeof(int),1,inQt);
     fread(&n2,sizeof(int),1,inQt);
     fread(&bc2,sizeof(int),1,inQt);
-    if(selQset>nx) {
-        printf("%s only has %d sets, set selQset=%d not available\n",fnQt,nx,selQset);
+    if(freqSel>nx) {
+        printf("%s only has %d sets, set freqSel=%d not available\n",fnQt,nx,freqSel);
         exit(1);
     }
     if(bc1!=bc2) {
@@ -163,7 +165,7 @@ int main(int argc, char *argv[])
     Qt.nu=n1;
     Qt.nv=n2;
 
-    for(i=0;i<selQset-1;i++) {
+    for(i=0;i<freqSel-1;i++) {
         fread(&bc1,sizeof(int),1,inQt);
         for(j=0;j<n1*n2;j++) {
             fread(&tmp1,sizeof(double),1,inQt);
@@ -248,12 +250,12 @@ int main(int argc, char *argv[])
     printf("\n");fflush(stdout);
     fclose(inCx);
 
-    sprintf(fnOut2,"QtCQ_Qset%d_%d-%d_%s.dat",selQset,first,last,fnOut);
+    sprintf(fnOut2,"QtCQ_freqSel%d_%d-%d_%s.dat",freqSel,first,last,fnOut);
     printf(" - writing output in file: %s\n",fnOut2);
     out=fopen(fnOut2,"w");
     /*printing times*/
     for(j=0;j<nx;j++) {
-            fprintf(out," %e",x0+j*dx);
+            fprintf(out," %e",j*df);
     }
     fprintf(out,"\n");
     for(i=first-1;i<last;i++) {
