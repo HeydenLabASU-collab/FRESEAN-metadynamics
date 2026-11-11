@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
     out = fopen(fnOut, "w");
     df = 33.3567/((2*nCorr-1)*dt);
     printf("Frequency Resolution: %f cm^-1\n", df);
-    printf("Generating list of frequencies at %s\n", fnOut);
+    printf("Writing list of frequencies in file: %s\n", fnOut);
     for(int i = 0; i < nCorr; i++){
         fprintf(out, "%d %f\n", i, df*i);
     }

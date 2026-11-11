@@ -11,7 +11,6 @@
 #include "../include/job.h"
 #include "../include/select.h"
 #include "../include/geo.h"
-#include "../include/mol.h"
 #include "../include/align.h"
 #include "../include/progress.h"
 
